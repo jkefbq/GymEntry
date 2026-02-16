@@ -1,4 +1,15 @@
 spring:
   kafka:
+    bootstrap-servers: 'localhost:9092'
     consumer:
-      group-id: gym-entry
+      group-id: my-group
+      auto-offset-reset: earliest
+
+app:
+  kafka:
+    bootstrap-servers-config: ${spring.kafka.bootstrap-servers}
+  topics:
+    buy-workout: buy-workout
+  tariff:
+    basic:
+      price-per-visit-rub: 199

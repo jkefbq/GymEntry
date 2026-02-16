@@ -10,5 +10,6 @@ public class Ticket {
     private UUID ticketId;
     private UUID userId;
     private Integer workoutCount;
+    private Boolean isUnlimited;
     private LocalDate purchasedAt;
 }
