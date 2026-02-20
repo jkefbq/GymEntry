@@ -17,3 +17,29 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 3
+
+  database:
+    container_name: database
+    image: postgres:18-alpine
+    restart: on-failure:3
+    environment:
+      - POSTGRES_USER=${DATABASE_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
+      - POSTGRES_DB=postgres
+    ports:
+      - '5433:5432'
+    volumes:
+      - pg-data:/var/lib/postgresql/18/docker
+
+  cache:
+    container_name: cache
+    image: redis:7-alpine
+    restart: on-failure:3
+    volumes:
+      - redis-data:/data
+    ports:
+      - '6379:6379'
+
+volumes:
+  pg-data:
+  redis-data:

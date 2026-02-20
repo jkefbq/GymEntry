@@ -1,15 +1,55 @@
+server:
+  port: ${CONTAINER_PORT:8080}
 spring:
+  datasource:
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:5433/${DATABASE_NAME:postgres}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
   kafka:
     bootstrap-servers: 'localhost:9092'
     consumer:
       group-id: my-group
       auto-offset-reset: earliest
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  cache:
+    type: redis
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5433}/${DATABASE_NAME:postgres}
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        ssl:
+          trust: "smtp.gmail.com"
 
 app:
   kafka:
     bootstrap-servers-config: ${spring.kafka.bootstrap-servers}
-  topics:
-    buy-workout: buy-workout
-  tariff:
-    basic:
-      price-per-visit-rub: 199
+    topics:
+      buy-workout: buy-workout
+  auth:
+    encryption-key: ${ENCRYPTION_AUTH_KEY}
+  controller:
+    urls:
+      activate: http://localhost:8080/activate/%s/%s
