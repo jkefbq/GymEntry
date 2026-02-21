@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -24,4 +25,5 @@ public class UserDto {
     @Size(min = 5, max = 255)
     private String password;
     private UserRole authority;
+    private List<SubscriptionDto> subscriptions;
 }

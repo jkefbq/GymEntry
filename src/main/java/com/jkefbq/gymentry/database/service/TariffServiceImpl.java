@@ -1,0 +1,35 @@
+package com.jkefbq.gymentry.database.service;
+
+import com.jkefbq.gymentry.database.dto.TariffDto;
+import com.jkefbq.gymentry.database.mapper.TariffMapper;
+import com.jkefbq.gymentry.database.repository.TariffRepository;
+import com.jkefbq.gymentry.shop.dto.TariffType;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class TariffServiceImpl implements TariffService {
+
+    private final TariffRepository tariffRepository;
+    private final TariffMapper tariffMapper;
+
+    @Override
+    @Transactional
+    public List<TariffDto> getAll() {
+        return tariffRepository.findAll().stream()
+                .map(tariffMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public Optional<TariffDto> getByType(TariffType type) {
+        return tariffRepository.getByTariffType(type).map(tariffMapper::toDto);
+    }
+
+}

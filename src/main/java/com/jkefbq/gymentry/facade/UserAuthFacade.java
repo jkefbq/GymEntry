@@ -10,7 +10,7 @@ import com.jkefbq.gymentry.security.UserCredentialsDto;
 
 import javax.naming.AuthenticationException;
 
-public interface UserRegisterFacade {
+public interface UserAuthFacade {
     void register(NotVerifiedUserDto user) throws UserAlreadyExistsException;
     TokenPairDto login(UserCredentialsDto userCredentials) throws AuthenticationException;
     TokenPairDto activate(String email, String code) throws InvalidVerificationCodeException, TimeoutActivationCodeException;

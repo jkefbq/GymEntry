@@ -2,27 +2,17 @@ package com.jkefbq.gymentry.database.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jkefbq.gymentry.shop.dto.TariffType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class SubscriptionDto {
-    private UUID id;
+@Data
+public class SubscriptionResponseDto {
     private Integer visitsTotal;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal snapshotPrice;
     private LocalDate purchaseAt;
     private Integer visitsLeft;
     private TariffType tariffType;
-    private UUID userId;
-    private boolean isActive;
 }

@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
 
 @Service
 @RequiredArgsConstructor
-public class UserRegisterFacadeImpl implements UserRegisterFacade {
+public class UserAuthFacadeImpl implements UserAuthFacade {
 
     private static final ExecutorService es = Executors.newCachedThreadPool();
     private final NotVerifiedUserService notVerifiedUserService;

@@ -2,7 +2,7 @@
 //
 //import com.jkefbq.gymentry.shop.dto.BasicTariff;
 //import com.jkefbq.gymentry.shop.dto.Ticket;
-//import com.jkefbq.gymentry.shop.service.SubscriptionService;
+//import com.jkefbq.gymentry.shop.service.SubscriptionServiceImpl;
 //import lombok.AllArgsConstructor;
 //import lombok.extern.slf4j.Slf4j;
 //import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,7 @@
 //@AllArgsConstructor
 //public class ShopController {
 //
-//    private final SubscriptionService subscriptionService;
+//    private final SubscriptionServiceImpl subscriptionService;
 //
 //    @GetMapping("/tariffs")
 //    public List<Ticket> getAllTariffs() {

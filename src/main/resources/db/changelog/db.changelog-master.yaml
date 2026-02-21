@@ -3,3 +3,7 @@ databaseChangeLog:
       file: db/changelog/0.0.1/changeset-create-users.sql
   - include:
       file: db/changelog/0.0.1/changeset-create-not_verified_users.sql
+  - include:
+      file: db/changelog/0.0.1/changeset-create-tariffs.sql
+  - include:
+      file: db/changelog/0.0.1/changeset-create-subscriptions.sql
