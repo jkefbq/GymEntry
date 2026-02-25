@@ -1,7 +1,7 @@
 package com.jkefbq.gymentry.database.repository;
 
 import com.jkefbq.gymentry.database.entity.Tariff;
-import com.jkefbq.gymentry.shop.dto.TariffType;
+import com.jkefbq.gymentry.database.dto.TariffType;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +25,9 @@ public class UserDto {
     private String email;
     @Size(min = 5, max = 255)
     private String password;
-    private UserRole authority;
+    private UserRole role;
+    private Integer totalVisits;
+    private LocalDate memberSince;
+    private LocalDate lastVisit;
     private List<SubscriptionDto> subscriptions;
 }

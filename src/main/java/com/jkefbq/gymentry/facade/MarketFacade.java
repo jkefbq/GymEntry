@@ -2,7 +2,7 @@ package com.jkefbq.gymentry.facade;
 
 import com.jkefbq.gymentry.database.dto.SubscriptionRequestDto;
 import com.jkefbq.gymentry.database.dto.SubscriptionResponseDto;
-import com.jkefbq.gymentry.shop.dto.TariffType;
+import com.jkefbq.gymentry.database.dto.TariffType;
 
 import java.math.BigDecimal;
 

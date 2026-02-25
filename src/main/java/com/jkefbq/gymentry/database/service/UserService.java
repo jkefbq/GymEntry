@@ -9,4 +9,5 @@ public interface UserService {
     Optional<UserDto> findByEmail(String email);
     boolean isCorrectEmailAndPassword(String email, String passwordToCheck);
     boolean existsByEmail(String email);
+    UserDto update(UserDto user);
 }

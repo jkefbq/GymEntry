@@ -82,13 +82,19 @@ public class UserAuthFacadeImpl implements UserAuthFacade {
         throw new InvalidTokenException("Invalid refresh token");
     }
 
+    @Override
+    public String resendActivationCode(String email) {
+        verificationCodeService.deleteVerificationCode(email);
+        return verificationCodeService.generateAndSaveVerificationCode(email);
+    }
+
     @Transactional
     public void deleteTmpUserAndCreateCommonUser(NotVerifiedUserDto notVerifiedUser) {
         var verifiedUser = UserDto.builder()
                 .firstName(notVerifiedUser.getFirstName())
                 .password(notVerifiedUser.getPassword())
                 .email(notVerifiedUser.getEmail())
-                .authority(UserRole.USER)
+                .role(UserRole.USER)
                 .build();
         userService.create(verifiedUser);
         notVerifiedUserService.deleteByEmail(notVerifiedUser.getEmail());

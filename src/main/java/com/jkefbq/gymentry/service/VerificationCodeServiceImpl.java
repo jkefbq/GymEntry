@@ -13,11 +13,11 @@ import java.security.SecureRandom;
 public class VerificationCodeServiceImpl implements VerificationCodeService {
 
     private static final int AUTH_CODE_LENGTH = 6;
-    private static final String CODE_CACHE_PREFIX = "auth_code";
+    private static final String CACHE_NAMES = "auth_code";
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    @Cacheable(cacheNames = CODE_CACHE_PREFIX, key = "#email")
+    @Cacheable(cacheNames = CACHE_NAMES, key = "#email")
     public String generateAndSaveVerificationCode(String email) {
         SecureRandom sr = new SecureRandom();
         int code = sr.nextInt(getCodeBound());
@@ -27,10 +27,15 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     @Override
     public boolean compareVerificationCode(String email, String code) throws TimeoutActivationCodeException {
         try {
-            return redisTemplate.opsForValue().get(CODE_CACHE_PREFIX + "::" + email).equals(code);
+            return redisTemplate.opsForValue().get(CACHE_NAMES + "::" + email).equals(code);
         } catch (NullPointerException e) {
             throw new TimeoutActivationCodeException("time to enter code has expired");
         }
+    }
+
+    @Override
+    public void deleteVerificationCode(String email) {
+        redisTemplate.delete(CACHE_NAMES + "::" + email);
     }
 
     private int getCodeBound() {

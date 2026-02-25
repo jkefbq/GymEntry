@@ -1,48 +1,62 @@
 package com.jkefbq.gymentry.facade;
 
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
+import com.jkefbq.gymentry.database.dto.UserDto;
 import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
-import com.jkefbq.gymentry.exception.SubscriptionExpiredException;
+import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
 import com.jkefbq.gymentry.exception.VisitsAreOverException;
+import com.jkefbq.gymentry.service.EntryCodeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
 public class GymEntryFacadeImpl implements GymEntryFacade {
 
     private final UserService userService;
+    private final EntryCodeService entryCodeService;
     private final SubscriptionService subscriptionService;
 
     @Override
     @Transactional
-    public void entry(String email) throws VisitsAreOverException, SubscriptionExpiredException {
-        SubscriptionDto subscription = userService.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("user with email " + email + " not found"))
-                .getSubscriptions().stream()
-                .filter(SubscriptionDto::isActive)
-                .findFirst()
-                .orElseThrow(() -> new SubscriptionExpiredException("you do not have any active subscriptions"));
-        decrementVisitsAndRefresh(subscription);
+    public String tryEntry(String email) throws VisitsAreOverException, NonActiveSubscriptionException {
+        try {
+            subscriptionService.validateAndGetActiveSubscription(email);
+        } catch (NonActiveSubscriptionException e) {
+            UserDto user = userService.findByEmail(email).orElseThrow();
+            long subscriptionCount = user.getSubscriptions().size();
+            if (subscriptionCount == 1) {
+                subscriptionService.activateSubscription(email, user.getSubscriptions().getFirst().getId());
+            } else {
+                throw e;
+            }
+        }
+        return entryCodeService.generateUserEntryCode(email);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
     @Transactional
-    protected void decrementVisitsAndRefresh(SubscriptionDto subscription) throws VisitsAreOverException {
-        if (subscription.getVisitsLeft() <= 0) {
-            throw new VisitsAreOverException("you have used up all your visits in your subscription");
-        }
-        subscription.setVisitsLeft(subscription.getVisitsLeft() - 1);
-        refreshSubscriptionData(subscription);
+    public void confirmEntry(String code, String email) throws NonActiveSubscriptionException, VisitsAreOverException {
+        SubscriptionDto subscription = validateSubscriptionAndDecrementVisits(code);
+        UserDto user = userService.findByEmail(email).orElseThrow();
+        user.setLastVisit(LocalDate.now());
+        user.setTotalVisits(user.getTotalVisits() + 1);
+        userService.update(user);
         subscriptionService.update(subscription);
     }
 
-    private void refreshSubscriptionData(SubscriptionDto subscriptionDto) {
-        if (subscriptionDto.getVisitsLeft() <= 0) {
-            subscriptionDto.setActive(false);
-        }
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    protected SubscriptionDto validateSubscriptionAndDecrementVisits(String code) throws NonActiveSubscriptionException, VisitsAreOverException {
+        String email = entryCodeService.getEmailByCode(code);
+        SubscriptionDto subscription = subscriptionService.validateAndGetActiveSubscription(email);
+        subscription.setVisitsLeft(subscription.getVisitsLeft() - 1);
+        return subscription;
     }
 }

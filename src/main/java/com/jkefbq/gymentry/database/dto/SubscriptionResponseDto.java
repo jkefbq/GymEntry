@@ -1,7 +1,6 @@
 package com.jkefbq.gymentry.database.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.jkefbq.gymentry.shop.dto.TariffType;
 import lombok.Data;
 
 import java.math.BigDecimal;

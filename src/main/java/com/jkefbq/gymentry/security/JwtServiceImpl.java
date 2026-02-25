@@ -56,7 +56,7 @@ public class JwtServiceImpl implements JwtService {
         } catch (ExpiredJwtException | UnsupportedJwtException |
                  MalformedJwtException | SecurityException e) {
             log.error("exception while validating token: ", e);
-            return false;
+            throw e;
         }
     }
 

@@ -11,6 +11,7 @@ import com.jkefbq.gymentry.security.UserCredentialsDto;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.naming.AuthenticationException;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
@@ -29,25 +31,36 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<@NonNull String> register(@RequestBody @Valid NotVerifiedUserDto user) throws UserAlreadyExistsException {
+        log.info("call /register for user with id {}", user.getId());
         userAuthFacade.register(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("successful registration, confirmation code has been sent to your email");
     }
 
+    @PostMapping("/resend-activation-code")
+    public ResponseEntity<@NonNull String> resendActivationCode(@RequestBody String email) {
+        log.info("call /resend-activation-code for user with email {}", email);
+        String newCode = userAuthFacade.resendActivationCode(email);
+        return ResponseEntity.ok(newCode);
+    }
+
     @GetMapping("/activate/{email}/{code}")
     public ResponseEntity<@NonNull TokenPairDto> activate(@PathVariable String email, @PathVariable String code) throws TimeoutActivationCodeException, InvalidVerificationCodeException {
+        log.info("call /activate/{}/{}", email, code);//fixme
         TokenPairDto tokenPair = userAuthFacade.activate(email, code);
         return ResponseEntity.ok(tokenPair);
     }
 
     @PostMapping("/login")
     public ResponseEntity<@NonNull TokenPairDto> signIn(@RequestBody @Valid UserCredentialsDto userCredentials) throws AuthenticationException {
+        log.info("call /login for user with email {}", userCredentials.getEmail());
         TokenPairDto tokenPair = userAuthFacade.login(userCredentials);
         return ResponseEntity.ok(tokenPair);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<@NonNull TokenPairDto> refresh(@RequestBody String refreshTokenDto) throws InvalidTokenException {
-        TokenPairDto newTokenPair = userAuthFacade.refresh(refreshTokenDto);
+    public ResponseEntity<@NonNull TokenPairDto> refresh(@RequestBody String refreshToken) throws InvalidTokenException {
+        log.info("call /refresh with token {}", refreshToken);
+        TokenPairDto newTokenPair = userAuthFacade.refresh(refreshToken);
         return ResponseEntity.ok(newTokenPair);
     }
 

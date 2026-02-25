@@ -1,13 +1,13 @@
 package com.jkefbq.gymentry.facade;
 
-import com.jkefbq.gymentry.SubscriptionPriceCalculator;
+import com.jkefbq.gymentry.service.SubscriptionPriceCalculator;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.dto.SubscriptionRequestDto;
 import com.jkefbq.gymentry.database.dto.SubscriptionResponseDto;
 import com.jkefbq.gymentry.database.mapper.SubscriptionMapper;
 import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
-import com.jkefbq.gymentry.shop.dto.TariffType;
+import com.jkefbq.gymentry.database.dto.TariffType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,12 +48,9 @@ public class MarketFacadeImpl implements MarketFacade {
         SubscriptionDto dto = subscriptionMapper.toDto(requestDto);
         dto.setPurchaseAt(LocalDate.now());
         dto.setVisitsLeft(dto.getVisitsTotal());
-        dto.setActive(true);
+        dto.setActive(false);
         dto.setSnapshotPrice(subscriptionPriceCalculator.calculate(dto));
         dto.setUserId(subscriptionOwnerId);
         return dto;
     }
-
-
-
 }

@@ -1,9 +1,10 @@
 package com.jkefbq.gymentry.database.service;
 
 import com.jkefbq.gymentry.database.dto.TariffDto;
+import com.jkefbq.gymentry.database.dto.TariffType;
+import com.jkefbq.gymentry.database.entity.Tariff;
 import com.jkefbq.gymentry.database.mapper.TariffMapper;
 import com.jkefbq.gymentry.database.repository.TariffRepository;
-import com.jkefbq.gymentry.shop.dto.TariffType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,19 @@ public class TariffServiceImpl implements TariffService {
     @Transactional
     public Optional<TariffDto> getByType(TariffType type) {
         return tariffRepository.getByTariffType(type).map(tariffMapper::toDto);
+    }
+
+    @Override
+    public List<TariffDto> saveAll(List<TariffDto> tariffList) {
+        List<Tariff> entityList = tariffList.stream().map(tariffMapper::toEntity).toList();
+        return tariffRepository.saveAll(entityList).stream().map(tariffMapper::toDto).toList();
+    }
+
+    @Override
+    public TariffDto create(TariffDto tariffDto) {
+        Tariff notSavedEntity = tariffMapper.toEntity(tariffDto);
+        Tariff savedEntity = tariffRepository.save(notSavedEntity);
+        return tariffMapper.toDto(savedEntity);
     }
 
 }

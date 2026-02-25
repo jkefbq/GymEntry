@@ -15,4 +15,5 @@ public interface UserAuthFacade {
     TokenPairDto login(UserCredentialsDto userCredentials) throws AuthenticationException;
     TokenPairDto activate(String email, String code) throws InvalidVerificationCodeException, TimeoutActivationCodeException;
     TokenPairDto refresh(String refreshToken) throws InvalidTokenException;
+    String resendActivationCode(String email);
 }

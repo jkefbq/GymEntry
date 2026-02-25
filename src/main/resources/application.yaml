@@ -50,6 +50,3 @@ app:
       buy-workout: buy-workout
   auth:
     encryption-key: ${ENCRYPTION_AUTH_KEY}
-  controller:
-    urls:
-      activate: http://localhost:8080/activate/%s/%s

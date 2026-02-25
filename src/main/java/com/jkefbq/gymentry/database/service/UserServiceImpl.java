@@ -4,11 +4,13 @@ import com.jkefbq.gymentry.database.dto.UserDto;
 import com.jkefbq.gymentry.database.entity.User;
 import com.jkefbq.gymentry.database.mapper.UserMapper;
 import com.jkefbq.gymentry.database.repository.UserRepository;
+import com.jkefbq.gymentry.security.UserRole;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -24,6 +26,9 @@ public class UserServiceImpl implements UserService {
     public UserDto create(UserDto dto) {
         User notSavedUser = userMapper.toEntity(dto);
         notSavedUser.setPassword(passwordEncoder.encode(dto.getPassword()));
+        notSavedUser.setMemberSince(LocalDate.now());
+        notSavedUser.setRole(UserRole.USER);
+        notSavedUser.setTotalVisits(0);
         User savedUser = userRepo.save(notSavedUser);
         return userMapper.toDto(savedUser);
     }
@@ -45,5 +50,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public boolean existsByEmail(String email) {
         return userRepo.existsByEmail(email);
+    }
+
+    @Override
+    public UserDto update(UserDto dto) {
+        User notSavedEntity = userMapper.toEntity(dto);
+        User savedEntity = userRepo.save(notSavedEntity);
+        return userMapper.toDto(savedEntity);
     }
 }

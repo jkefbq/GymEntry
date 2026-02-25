@@ -5,6 +5,9 @@ CREATE TABLE IF NOT EXISTS users (
     first_name VARCHAR,
     email VARCHAR,
     password VARCHAR,
-    authority VARCHAR
+    role VARCHAR,
+    total_visits INT,
+    member_since DATE,
+    last_visit DATE
 );
 --rollback DROP TABLE users;

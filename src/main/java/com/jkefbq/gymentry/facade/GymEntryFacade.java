@@ -1,8 +1,9 @@
 package com.jkefbq.gymentry.facade;
 
-import com.jkefbq.gymentry.exception.SubscriptionExpiredException;
+import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
 import com.jkefbq.gymentry.exception.VisitsAreOverException;
 
 public interface GymEntryFacade {
-    void entry(String email) throws VisitsAreOverException, SubscriptionExpiredException;
+    String tryEntry(String email) throws VisitsAreOverException, NonActiveSubscriptionException;
+    void confirmEntry(String code, String email) throws NonActiveSubscriptionException, VisitsAreOverException;
 }
