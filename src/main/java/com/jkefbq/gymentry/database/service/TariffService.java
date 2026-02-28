@@ -11,4 +11,5 @@ public interface TariffService {
     Optional<TariffDto> getByType(TariffType type);
     List<TariffDto> saveAll(List<TariffDto> tariffList);
     TariffDto create(TariffDto tariffDto);
+    void deleteAll(List<TariffDto> tariffs);
 }

@@ -45,7 +45,7 @@ public class AuthController {
 
     @GetMapping("/activate/{email}/{code}")
     public ResponseEntity<@NonNull TokenPairDto> activate(@PathVariable String email, @PathVariable String code) throws TimeoutActivationCodeException, InvalidVerificationCodeException {
-        log.info("call /activate/{}/{}", email, code);//fixme
+        log.info("call /activate/{}/{}", email, code);
         TokenPairDto tokenPair = userAuthFacade.activate(email, code);
         return ResponseEntity.ok(tokenPair);
     }

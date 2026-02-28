@@ -1,14 +1,19 @@
 package com.jkefbq.gymentry.facade;
 
+import com.jkefbq.gymentry.database.dto.GymInfoDto;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.dto.UserDto;
+import com.jkefbq.gymentry.database.service.GymInfoService;
 import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
 import com.jkefbq.gymentry.exception.VisitsAreOverException;
+import com.jkefbq.gymentry.kafka.producer.KafkaProducer;
 import com.jkefbq.gymentry.service.EntryCodeService;
 import jakarta.transaction.Transactional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +26,9 @@ public class GymEntryFacadeImpl implements GymEntryFacade {
     private final UserService userService;
     private final EntryCodeService entryCodeService;
     private final SubscriptionService subscriptionService;
+    private final KafkaTemplate<@NonNull String, @NonNull Object> kafkaTemplate;
+    private final KafkaProducer kafkaProducer;
+    private final GymInfoService gymInfoService;
 
     @Override
     @Transactional
@@ -42,11 +50,13 @@ public class GymEntryFacadeImpl implements GymEntryFacade {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     @Transactional
-    public void confirmEntry(String code, String email) throws NonActiveSubscriptionException, VisitsAreOverException {
+    public void confirmEntry(String code, String email, String gymAddress) throws NonActiveSubscriptionException, VisitsAreOverException {
         SubscriptionDto subscription = validateSubscriptionAndDecrementVisits(code);
         UserDto user = userService.findByEmail(email).orElseThrow();
         user.setLastVisit(LocalDate.now());
         user.setTotalVisits(user.getTotalVisits() + 1);
+        GymInfoDto gymInfoDto = gymInfoService.getByAddress(gymAddress).orElseThrow();
+        kafkaProducer.sendVisitEvent(subscription, gymInfoDto);
         userService.update(user);
         subscriptionService.update(subscription);
     }
