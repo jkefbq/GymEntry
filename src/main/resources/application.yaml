@@ -47,6 +47,6 @@ app:
   kafka:
     bootstrap-servers-config: ${spring.kafka.bootstrap-servers}
     topics:
-      buy-workout: buy-workout
+      visits: visits
   auth:
     encryption-key: ${ENCRYPTION_AUTH_KEY}

@@ -2,7 +2,6 @@ package com.jkefbq.gymentry.service;
 
 import com.jkefbq.gymentry.exception.TimeoutActivationCodeException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +16,11 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    @Cacheable(cacheNames = CACHE_NAMES, key = "#email")
     public String generateAndSaveVerificationCode(String email) {
         SecureRandom sr = new SecureRandom();
-        int code = sr.nextInt(getCodeBound());
-        return String.format("%06d", code);
+        String code = String.format("%06d", sr.nextInt(getCodeBound()));
+        redisTemplate.opsForValue().set(CACHE_NAMES + "::" + email, code);
+        return code;
     }
 
     @Override

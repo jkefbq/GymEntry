@@ -1,22 +1,36 @@
 package com.jkefbq.gymentry.controller;
 
+import com.jkefbq.gymentry.database.dto.EntryCode;
+import com.jkefbq.gymentry.database.dto.GymInfoDto;
+import com.jkefbq.gymentry.database.dto.PurchaseStatistics;
 import com.jkefbq.gymentry.database.dto.TariffDto;
+import com.jkefbq.gymentry.database.dto.TariffType;
+import com.jkefbq.gymentry.database.dto.VisitStatistics;
+import com.jkefbq.gymentry.database.service.GymInfoService;
+import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.TariffService;
 import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
 import com.jkefbq.gymentry.exception.VisitsAreOverException;
+import com.jkefbq.gymentry.facade.AdminStatisticsFacade;
 import com.jkefbq.gymentry.facade.GymEntryFacade;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -27,25 +41,66 @@ public class AdminController {
 
     private final GymEntryFacade gymEntryFacade;
     private final TariffService tariffService;
+    private final AdminStatisticsFacade adminStatisticsFacade;
+    private final SubscriptionService subscriptionService;
+    private final GymInfoService gymInfoService;
 
     @PostMapping("/confirm-entry")
     public ResponseEntity<@NonNull String> confirmEntry(
-            @AuthenticationPrincipal UserDetails userDetails, @RequestBody String code) throws VisitsAreOverException, NonActiveSubscriptionException {
-        log.info("call /confirm-entry");
-        gymEntryFacade.confirmEntry(code, userDetails.getUsername());
-        return ResponseEntity.ok("Success! Have a good training session.");
+            @AuthenticationPrincipal UserDetails userDetails, @RequestBody @Valid EntryCode code, @RequestParam String gymAddress) throws VisitsAreOverException, NonActiveSubscriptionException {
+        log.info("call /admin/confirm-entry");
+        gymEntryFacade.confirmEntry(code.getCode(), userDetails.getUsername(), gymAddress);
+        return ResponseEntity.ok("Успех! посетитель может идти на тренировку");
     }
 
     @PostMapping("/create-tariff")
     public List<TariffDto> createTariff(@RequestBody TariffDto tariffDto) {
-        log.info("call /create-tariff");
+        log.info("call /admin/create-tariff");
         tariffService.create(tariffDto);
         return tariffService.getAll();
     }
 
     @PutMapping("edit/tariffs")
     public List<TariffDto> editTariffs(@RequestBody List<TariffDto> tariffList) {
-        log.info("call edit/tariffs");
+        log.info("call /admin/edit/tariffs");
         return tariffService.saveAll(tariffList);
     }
+
+    @GetMapping("/tariff-types")
+    public TariffType[] getAllTariffTypes() {
+        log.info("call /admin/tariff-types");
+        return TariffType.values();
+    }
+
+    @DeleteMapping("/delete-tariffs")
+    public ResponseEntity<@NonNull String> deleteTariffs(@RequestBody List<TariffDto> tariffList) {
+        log.info("call /admin/delete-tariffs with args {}", tariffList);
+        tariffService.deleteAll(tariffList);
+        return ResponseEntity.ok("success");
+    }
+
+    @PostMapping("/edit/gym-info")
+    public GymInfoDto editGymInfoDto(@RequestBody GymInfoDto gymInfoDto) {
+        log.info("call /admin/edit/gym-info");
+        return gymInfoService.save(gymInfoDto);
+    }
+
+    @GetMapping("/gym/addresses")
+    public List<String> getAllAddresses() {
+        log.info("call /admin/gym/addresses");
+        return gymInfoService.getAllAddresses();
+    }
+
+    @GetMapping("/statistics/visits/summary")
+    public VisitStatistics getVisitsForPeriod(@RequestParam LocalDateTime from, @RequestParam LocalDateTime to, @RequestParam String gymAddress) {
+        log.info("call /admin/statistics/visits/summary?from={}&to={}&gymAddress={}", from, to, gymAddress);
+        return adminStatisticsFacade.getVisitStatisticsForPeriod(from, to, gymAddress);
+    }
+
+    @GetMapping("/statistics/purchases/summary")
+    public PurchaseStatistics getSubscriptionForPeriod(@RequestParam LocalDate from, @RequestParam LocalDate to) {
+        log.info("call /admin/statistics/purchases/summary?from={}&to={}", from, to);
+        return adminStatisticsFacade.getPurchaseStatisticsForPeriod(from, to);
+    }
+
 }

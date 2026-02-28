@@ -46,4 +46,10 @@ public class TariffServiceImpl implements TariffService {
         return tariffMapper.toDto(savedEntity);
     }
 
+    @Override
+    public void deleteAll(List<TariffDto> tariffs) {
+        List<Tariff> entities = tariffs.stream().map(tariffMapper::toEntity).toList();
+        tariffRepository.deleteAll(entities);
+    }
+
 }

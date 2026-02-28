@@ -23,5 +23,5 @@ public class SubscriptionDto {
     private Integer visitsLeft;
     private TariffType tariffType;
     private UUID userId;
-    private boolean isActive;
+    private Boolean active;
 }

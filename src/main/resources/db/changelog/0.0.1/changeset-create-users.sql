@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
     role VARCHAR,
     total_visits INT,
     member_since DATE,
-    last_visit DATE
+    last_visit DATE,
+    gym_info_id UUID,
+    FOREIGN KEY (gym_info_id) REFERENCES gym_info(id)
 );
 --rollback DROP TABLE users;
