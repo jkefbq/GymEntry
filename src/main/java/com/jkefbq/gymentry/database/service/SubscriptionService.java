@@ -1,8 +1,8 @@
 package com.jkefbq.gymentry.database.service;
 
-import com.jkefbq.gymentry.database.dto.PeakPurchasesDay;
-import com.jkefbq.gymentry.database.dto.PurchasePerDate;
-import com.jkefbq.gymentry.database.dto.PurchaseTariffTypePerDate;
+import com.jkefbq.gymentry.dto.PeakPurchasesDay;
+import com.jkefbq.gymentry.dto.PurchasePerDate;
+import com.jkefbq.gymentry.dto.PurchaseTariffTypePerDate;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
 import com.jkefbq.gymentry.exception.VisitsAreOverException;

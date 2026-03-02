@@ -70,7 +70,8 @@ public class JwtServiceImpl implements JwtService {
         return claims.getSubject();
     }
 
-    private String generateAccessToken(String email) {
+    @Override
+    public String generateAccessToken(String email) {
         Date date = Date.from(LocalDateTime.now().plus(ACCESS_TTL).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .subject(email)
@@ -79,7 +80,8 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-    private String generateRefreshToken(String email) {
+    @Override
+    public String generateRefreshToken(String email) {
         Date date = Date.from(LocalDateTime.now().plus(REFRESH_TTL).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .subject(email)

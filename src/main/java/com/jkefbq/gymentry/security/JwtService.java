@@ -5,4 +5,8 @@ public interface JwtService {
     TokenPairDto refreshAccessTokenAndRotate(String email);
     boolean isAnyTokenValid(String refreshToken);
     String getEmailFromAccessToken(String token);
+
+    String generateAccessToken(String email);
+
+    String generateRefreshToken(String email);
 }

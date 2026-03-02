@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name VARCHAR,
-    email VARCHAR,
+    email VARCHAR UNIQUE,
     password VARCHAR,
     role VARCHAR,
     total_visits INT,

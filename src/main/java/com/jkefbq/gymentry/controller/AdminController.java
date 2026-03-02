@@ -1,13 +1,12 @@
 package com.jkefbq.gymentry.controller;
 
-import com.jkefbq.gymentry.database.dto.EntryCode;
+import com.jkefbq.gymentry.dto.EntryCode;
 import com.jkefbq.gymentry.database.dto.GymInfoDto;
-import com.jkefbq.gymentry.database.dto.PurchaseStatistics;
+import com.jkefbq.gymentry.dto.PurchaseStatistics;
 import com.jkefbq.gymentry.database.dto.TariffDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
-import com.jkefbq.gymentry.database.dto.VisitStatistics;
+import com.jkefbq.gymentry.dto.VisitStatistics;
 import com.jkefbq.gymentry.database.service.GymInfoService;
-import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.TariffService;
 import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
 import com.jkefbq.gymentry.exception.VisitsAreOverException;
@@ -18,6 +17,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,13 +36,13 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/admin")
+@PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class AdminController {
 
     private final GymEntryFacade gymEntryFacade;
     private final TariffService tariffService;
     private final AdminStatisticsFacade adminStatisticsFacade;
-    private final SubscriptionService subscriptionService;
     private final GymInfoService gymInfoService;
 
     @PostMapping("/confirm-entry")
@@ -53,7 +53,7 @@ public class AdminController {
         return ResponseEntity.ok("Успех! посетитель может идти на тренировку");
     }
 
-    @PostMapping("/create-tariff")
+    @PostMapping("/create/tariff")
     public List<TariffDto> createTariff(@RequestBody TariffDto tariffDto) {
         log.info("call /admin/create-tariff");
         tariffService.create(tariffDto);
@@ -66,20 +66,20 @@ public class AdminController {
         return tariffService.saveAll(tariffList);
     }
 
-    @GetMapping("/tariff-types")
+    @GetMapping("/tariffs/types")
     public TariffType[] getAllTariffTypes() {
         log.info("call /admin/tariff-types");
         return TariffType.values();
     }
 
-    @DeleteMapping("/delete-tariffs")
+    @DeleteMapping("/delete/tariffs")
     public ResponseEntity<@NonNull String> deleteTariffs(@RequestBody List<TariffDto> tariffList) {
         log.info("call /admin/delete-tariffs with args {}", tariffList);
         tariffService.deleteAll(tariffList);
         return ResponseEntity.ok("success");
     }
 
-    @PostMapping("/edit/gym-info")
+    @PutMapping("/edit/gym-info")
     public GymInfoDto editGymInfoDto(@RequestBody GymInfoDto gymInfoDto) {
         log.info("call /admin/edit/gym-info");
         return gymInfoService.save(gymInfoDto);
@@ -91,14 +91,14 @@ public class AdminController {
         return gymInfoService.getAllAddresses();
     }
 
-    @GetMapping("/statistics/visits/summary")
-    public VisitStatistics getVisitsForPeriod(@RequestParam LocalDateTime from, @RequestParam LocalDateTime to, @RequestParam String gymAddress) {
+    @GetMapping("/statistics/visits")
+    public VisitStatistics getVisitStatisticsForPeriod(@RequestParam LocalDateTime from, @RequestParam LocalDateTime to, @RequestParam String gymAddress) {
         log.info("call /admin/statistics/visits/summary?from={}&to={}&gymAddress={}", from, to, gymAddress);
         return adminStatisticsFacade.getVisitStatisticsForPeriod(from, to, gymAddress);
     }
 
-    @GetMapping("/statistics/purchases/summary")
-    public PurchaseStatistics getSubscriptionForPeriod(@RequestParam LocalDate from, @RequestParam LocalDate to) {
+    @GetMapping("/statistics/purchases")
+    public PurchaseStatistics getPurchaseStatisticsForPeriod(@RequestParam LocalDate from, @RequestParam LocalDate to) {
         log.info("call /admin/statistics/purchases/summary?from={}&to={}", from, to);
         return adminStatisticsFacade.getPurchaseStatisticsForPeriod(from, to);
     }

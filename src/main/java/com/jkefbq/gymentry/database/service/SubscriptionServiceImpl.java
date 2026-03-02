@@ -1,8 +1,8 @@
 package com.jkefbq.gymentry.database.service;
 
-import com.jkefbq.gymentry.database.dto.PeakPurchasesDay;
-import com.jkefbq.gymentry.database.dto.PurchasePerDate;
-import com.jkefbq.gymentry.database.dto.PurchaseTariffTypePerDate;
+import com.jkefbq.gymentry.dto.PeakPurchasesDay;
+import com.jkefbq.gymentry.dto.PurchasePerDate;
+import com.jkefbq.gymentry.dto.PurchaseTariffTypePerDate;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.entity.Subscription;
 import com.jkefbq.gymentry.database.mapper.SubscriptionMapper;
@@ -103,7 +103,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         List<PurchasePerDate> purchasePerDates = getPurchasesPerDate(subscriptionsForPeriod);
         return purchasePerDates.stream()
                 .max(Comparator.comparing(PurchasePerDate::getPurchaseSum))
-                .map(purchase -> new PeakPurchasesDay(purchase.getDate(), purchase.getPurchaseCount(), purchase.getPurchaseSum()))
+                .map(PeakPurchasesDay::new)
                 .orElseThrow(() -> new IllegalStateException("array of purchases is empty"));
     }
 

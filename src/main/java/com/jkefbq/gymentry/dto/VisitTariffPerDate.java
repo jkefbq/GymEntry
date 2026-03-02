@@ -1,5 +1,6 @@
-package com.jkefbq.gymentry.database.dto;
+package com.jkefbq.gymentry.dto;
 
+import com.jkefbq.gymentry.database.dto.TariffType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

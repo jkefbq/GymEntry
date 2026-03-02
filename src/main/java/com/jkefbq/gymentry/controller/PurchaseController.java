@@ -1,7 +1,7 @@
 package com.jkefbq.gymentry.controller;
 
-import com.jkefbq.gymentry.database.dto.SubscriptionRequestDto;
-import com.jkefbq.gymentry.database.dto.SubscriptionResponseDto;
+import com.jkefbq.gymentry.dto.SubscriptionRequestDto;
+import com.jkefbq.gymentry.dto.SubscriptionResponseDto;
 import com.jkefbq.gymentry.database.dto.TariffDto;
 import com.jkefbq.gymentry.database.service.TariffService;
 import com.jkefbq.gymentry.facade.MarketFacade;
@@ -33,19 +33,18 @@ public class PurchaseController {
     private final MarketFacade marketFacade;
 
     @GetMapping
-    public ResponseEntity<@NonNull List<TariffDto>> getAllTariffs() {
+    public List<TariffDto> getAllTariffs() {
         log.info("call /market");
-        return ResponseEntity.ok(tariffService.getAll());
+        return tariffService.getAll();
     }
 
     @GetMapping("/calculate-price/{tariff-type}/{visits}")
-    public ResponseEntity<@NonNull BigDecimal> calculatePrice(
+    public BigDecimal calculatePrice(
             @PathVariable("tariff-type") TariffType tariffType,
             @PathVariable("visits") Integer visitsCount
     ) {
         log.info("call /market/calculate-price/{}/{}", tariffType, visitsCount);
-        BigDecimal price = marketFacade.calculatePrice(tariffType, visitsCount);
-        return ResponseEntity.ok(price);
+        return marketFacade.calculatePrice(tariffType, visitsCount);
     }
 
     @PostMapping("/subscription")

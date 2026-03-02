@@ -1,9 +1,9 @@
 package com.jkefbq.gymentry.database.service;
 
-import com.jkefbq.gymentry.database.dto.PeakVisitsDay;
+import com.jkefbq.gymentry.dto.PeakVisitsDay;
 import com.jkefbq.gymentry.database.dto.VisitDto;
-import com.jkefbq.gymentry.database.dto.VisitPerDate;
-import com.jkefbq.gymentry.database.dto.VisitTariffPerDate;
+import com.jkefbq.gymentry.dto.VisitPerDate;
+import com.jkefbq.gymentry.dto.VisitTariffPerDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

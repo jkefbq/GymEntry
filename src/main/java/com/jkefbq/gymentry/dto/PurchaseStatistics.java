@@ -1,4 +1,4 @@
-package com.jkefbq.gymentry.database.dto;
+package com.jkefbq.gymentry.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

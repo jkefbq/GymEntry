@@ -6,6 +6,7 @@ import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
 import com.jkefbq.gymentry.exception.VisitsAreOverException;
+import com.jkefbq.gymentry.facade.GymEntryFacade;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,37 +30,42 @@ import java.util.UUID;
 @RequestMapping("/user")
 public class UserController {
 
+    private final GymEntryFacade gymEntryFacade;
     private final UserService userService;
     private final SubscriptionService subscriptionService;
 
     @GetMapping("me")
-    public ResponseEntity<@NonNull UserDto> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
+    public UserDto getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
         log.info("call user/me, user with email {}", userDetails.getUsername());
-        UserDto user = userService.findByEmail(userDetails.getUsername())
+        return userService.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new NoSuchElementException("user with email " + userDetails.getUsername() + " not found"));
-        return ResponseEntity.ok(user);
     }
 
     @GetMapping("subscriptions")
-    public ResponseEntity<@NonNull List<SubscriptionDto>> getAllSubscriptions(@AuthenticationPrincipal UserDetails userDetails) {
+    public List<SubscriptionDto> getAllSubscriptions(@AuthenticationPrincipal UserDetails userDetails) {
         log.info("call user/subscriptions, user with email {}", userDetails.getUsername());
-        var subscriptions = subscriptionService.getAllSubscriptions(userDetails.getUsername());
-        return ResponseEntity.ok(subscriptions);
+        return subscriptionService.getAllSubscriptions(userDetails.getUsername());
     }
 
     @GetMapping("subscriptions/active")
-    public ResponseEntity<@NonNull SubscriptionDto> getActiveSubscription(@AuthenticationPrincipal UserDetails userDetails) throws VisitsAreOverException, NonActiveSubscriptionException {
+    public SubscriptionDto getActiveSubscription(@AuthenticationPrincipal UserDetails userDetails) throws VisitsAreOverException, NonActiveSubscriptionException {
         log.info("call user/subscriptions/active, user with email {}", userDetails.getUsername());
-        var subscription = subscriptionService.validateAndGetActiveSubscription(userDetails.getUsername());
-        return ResponseEntity.ok(subscription);
+        return subscriptionService.validateAndGetActiveSubscription(userDetails.getUsername());
     }
 
     @PostMapping("subscriptions/activate")
-    public ResponseEntity<@NonNull SubscriptionDto> activateSubscription(
+    public SubscriptionDto activateSubscription(
             @AuthenticationPrincipal UserDetails userDetails, @RequestBody UUID subscriptionId) {
         log.info("call user/subscriptions/activate, user with email {}", userDetails.getUsername());
-        var activatedSubscription = subscriptionService.activateSubscription(userDetails.getUsername(), subscriptionId);
-        return ResponseEntity.ok(activatedSubscription);
+        return subscriptionService.activateSubscription(userDetails.getUsername(), subscriptionId);
     }
 
+    @PutMapping("/entry")
+    public ResponseEntity<@NonNull String> getGymEntryCode(@AuthenticationPrincipal UserDetails userDetails) throws VisitsAreOverException, NonActiveSubscriptionException {
+        log.info("call /entry for user with email {}", userDetails.getUsername());
+        String entryCode = gymEntryFacade.tryEntry(userDetails.getUsername());
+        return ResponseEntity.ok(entryCode);
+    }
+
+    //todo деактивация абонемента + тесты
 }

@@ -1,4 +1,4 @@
-package com.jkefbq.gymentry.database.dto;
+package com.jkefbq.gymentry.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
-public class PeakPurchasesDay {
+public class PurchasePerDate {
     private LocalDate date;
     private Long purchaseCount;
     private BigDecimal purchaseSum;

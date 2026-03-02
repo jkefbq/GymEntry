@@ -1,13 +1,13 @@
 package com.jkefbq.gymentry.facade;
 
-import com.jkefbq.gymentry.service.SubscriptionPriceCalculator;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
-import com.jkefbq.gymentry.database.dto.SubscriptionRequestDto;
-import com.jkefbq.gymentry.database.dto.SubscriptionResponseDto;
+import com.jkefbq.gymentry.database.dto.TariffType;
 import com.jkefbq.gymentry.database.mapper.SubscriptionMapper;
 import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
-import com.jkefbq.gymentry.database.dto.TariffType;
+import com.jkefbq.gymentry.dto.SubscriptionRequestDto;
+import com.jkefbq.gymentry.dto.SubscriptionResponseDto;
+import com.jkefbq.gymentry.service.SubscriptionPriceCalculator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

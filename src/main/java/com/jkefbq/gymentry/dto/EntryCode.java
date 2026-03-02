@@ -1,4 +1,4 @@
-package com.jkefbq.gymentry.database.dto;
+package com.jkefbq.gymentry.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.validation.constraints.NotNull;

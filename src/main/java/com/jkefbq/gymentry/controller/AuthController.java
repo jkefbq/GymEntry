@@ -1,6 +1,8 @@
 package com.jkefbq.gymentry.controller;
 
+import com.jkefbq.gymentry.dto.EmailDto;
 import com.jkefbq.gymentry.database.dto.NotVerifiedUserDto;
+import com.jkefbq.gymentry.dto.RefreshTokenDto;
 import com.jkefbq.gymentry.exception.InvalidTokenException;
 import com.jkefbq.gymentry.exception.InvalidVerificationCodeException;
 import com.jkefbq.gymentry.exception.TimeoutActivationCodeException;
@@ -37,31 +39,27 @@ public class AuthController {
     }
 
     @PostMapping("/resend-activation-code")
-    public ResponseEntity<@NonNull String> resendActivationCode(@RequestBody String email) {
-        log.info("call /resend-activation-code for user with email {}", email);
-        String newCode = userAuthFacade.resendActivationCode(email);
-        return ResponseEntity.ok(newCode);
+    public String resendActivationCode(@RequestBody EmailDto emailDto) {
+        log.info("call /resend-activation-code for user with email {}", emailDto);
+        return userAuthFacade.resendActivationCode(emailDto.getEmail());
     }
 
     @GetMapping("/activate/{email}/{code}")
-    public ResponseEntity<@NonNull TokenPairDto> activate(@PathVariable String email, @PathVariable String code) throws TimeoutActivationCodeException, InvalidVerificationCodeException {
+    public TokenPairDto activate(@PathVariable String email, @PathVariable String code) throws TimeoutActivationCodeException, InvalidVerificationCodeException {
         log.info("call /activate/{}/{}", email, code);
-        TokenPairDto tokenPair = userAuthFacade.activate(email, code);
-        return ResponseEntity.ok(tokenPair);
+        return userAuthFacade.activate(email, code);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<@NonNull TokenPairDto> signIn(@RequestBody @Valid UserCredentialsDto userCredentials) throws AuthenticationException {
+    public TokenPairDto signIn(@RequestBody @Valid UserCredentialsDto userCredentials) throws AuthenticationException {
         log.info("call /login for user with email {}", userCredentials.getEmail());
-        TokenPairDto tokenPair = userAuthFacade.login(userCredentials);
-        return ResponseEntity.ok(tokenPair);
+        return userAuthFacade.login(userCredentials);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<@NonNull TokenPairDto> refresh(@RequestBody String refreshToken) throws InvalidTokenException {
-        log.info("call /refresh with token {}", refreshToken);
-        TokenPairDto newTokenPair = userAuthFacade.refresh(refreshToken);
-        return ResponseEntity.ok(newTokenPair);
+    public TokenPairDto refresh(@RequestBody RefreshTokenDto refreshTokenDto) throws InvalidTokenException {
+        log.info("call /refresh with token {}", refreshTokenDto.getRefreshToken());
+        return userAuthFacade.refresh(refreshTokenDto.getRefreshToken());
     }
 
 }
