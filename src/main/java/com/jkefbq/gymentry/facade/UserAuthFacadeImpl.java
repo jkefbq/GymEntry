@@ -74,7 +74,7 @@ public class UserAuthFacadeImpl implements UserAuthFacade {
     @Transactional
     public TokenPairDto refresh(String refreshToken) throws InvalidTokenException {
         if (jwtService.isAnyTokenValid(refreshToken)) {
-            String email = jwtService.getEmailFromAccessToken(refreshToken);
+            String email = jwtService.getEmailFromToken(refreshToken);
             UserDto authenticUser = userService.findByEmail(email)
                     .orElseThrow(() -> new NoSuchElementException("no user with email " + email));
             return jwtService.refreshAccessTokenAndRotate(authenticUser.getEmail());

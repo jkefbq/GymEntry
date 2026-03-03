@@ -61,7 +61,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String getEmailFromAccessToken(String token) {
+    public String getEmailFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getSecretKey())
                 .build()

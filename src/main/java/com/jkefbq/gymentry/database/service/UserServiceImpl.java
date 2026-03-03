@@ -53,6 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto update(UserDto dto) {
         User notSavedEntity = userMapper.toEntity(dto);
         User savedEntity = userRepo.save(notSavedEntity);

@@ -30,16 +30,19 @@ public class TariffServiceImpl implements TariffService {
     @Override
     @Transactional
     public Optional<TariffDto> getByType(TariffType type) {
-        return tariffRepository.getByTariffType(type).map(tariffMapper::toDto);
+        return tariffRepository.getByTariffType(type)
+                .map(tariffMapper::toDto);
     }
 
     @Override
+    @Transactional
     public List<TariffDto> saveAll(List<TariffDto> tariffList) {
         List<Tariff> entityList = tariffList.stream().map(tariffMapper::toEntity).toList();
         return tariffRepository.saveAll(entityList).stream().map(tariffMapper::toDto).toList();
     }
 
     @Override
+    @Transactional
     public TariffDto create(TariffDto tariffDto) {
         Tariff notSavedEntity = tariffMapper.toEntity(tariffDto);
         Tariff savedEntity = tariffRepository.save(notSavedEntity);
@@ -47,6 +50,7 @@ public class TariffServiceImpl implements TariffService {
     }
 
     @Override
+    @Transactional
     public void deleteAll(List<TariffDto> tariffs) {
         List<Tariff> entities = tariffs.stream().map(tariffMapper::toEntity).toList();
         tariffRepository.deleteAll(entities);

@@ -1,12 +1,11 @@
 package com.jkefbq.gymentry.facade;
 
-import com.jkefbq.gymentry.dto.PurchaseStatistics;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.dto.VisitDto;
-import com.jkefbq.gymentry.dto.VisitStatistics;
 import com.jkefbq.gymentry.database.service.SubscriptionService;
-import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.database.service.VisitService;
+import com.jkefbq.gymentry.dto.PurchaseStatistics;
+import com.jkefbq.gymentry.dto.VisitStatistics;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ public class AdminStatisticsFacadeImpl implements AdminStatisticsFacade {
 
     private final VisitService visitService;
     private final SubscriptionService subscriptionService;
-    private final UserService userService;
 
     @Transactional
     @Override
