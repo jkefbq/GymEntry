@@ -19,7 +19,7 @@ public class PurchaseStatistics {
     private Integer totalPurchases;
     private BigDecimal totalRevenue;
     private BigDecimal avgDayCheck;
-    private BigDecimal avgPersonCheck;
+    private BigDecimal avgPurchaseCheck;
     private PeakPurchasesDay peakPurchasesDay;
     private List<PurchasePerDate> byDay;
     private List<PurchaseTariffTypePerDate> byTariffType;

@@ -1,7 +1,7 @@
 package com.jkefbq.gymentry.facade;
 
 import com.jkefbq.gymentry.database.dto.NotVerifiedUserDto;
-import com.jkefbq.gymentry.database.dto.UserDto;
+import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.service.NotVerifiedUserService;
 import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.exception.InvalidTokenException;
@@ -104,7 +104,6 @@ public class UserAuthFacadeImplTest {
 
     @Test
     public void activateTest_throwInvalidVerificationCodeException() throws TimeoutActivationCodeException {
-        var user = new NotVerifiedUserDto();
         when(verificationCodeService.compareVerificationCode(any(), any())).thenReturn(false);
 
         assertThrows(InvalidVerificationCodeException.class, () -> userAuthFacade.activate("email", "code"));
@@ -122,7 +121,7 @@ public class UserAuthFacadeImplTest {
     @Test
     public void refreshTest() throws InvalidTokenException {
         when(jwtService.isAnyTokenValid(any())).thenReturn(true);
-        when(userService.findByEmail(any())).thenReturn(Optional.of(new UserDto()));
+        when(userService.findByEmail(any())).thenReturn(Optional.of(new PartialUserDto()));
         var refreshToken = UUID.randomUUID().toString();
 
         userAuthFacade.refresh(refreshToken);

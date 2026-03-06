@@ -1,0 +1,8 @@
+spring:
+  mail:
+    username: test
+    password: test
+
+app:
+  auth:
+    encryption-key: v6UpDJUQHLSWuc9C55mnULpkrjj5zORlhTZQ2w6HQmd

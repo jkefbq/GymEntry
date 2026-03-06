@@ -17,6 +17,8 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class NotVerifiedUserServiceImplTest {
 
+    private static final String EMAIL = "email@gmail.com";
+
     @Mock
     NotVerifiedUserRepository repository;
     @Mock
@@ -24,8 +26,6 @@ public class NotVerifiedUserServiceImplTest {
 
     @InjectMocks
     NotVerifiedUserServiceImpl notVerUserService;
-
-    private static final String EMAIL = "email@gmail.com";
 
     public NotVerifiedUserDto getUserDto() {
         return new NotVerifiedUserDto(

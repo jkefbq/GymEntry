@@ -1,0 +1,23 @@
+INSERT INTO tariffs (tariff_name, description, price_per_lesson, tariff_type)
+VALUES
+    ( 'basic', 'basic tariff', 200, 'BASIC'),
+    ( 'basic_plus', ' plus tariff', 250,  'BASIC_PLUS'),
+    ( 'middle', 'middle tariff', 240, 'MIDDLE'),
+    ( 'middle_plus', 'plus tariff', 300, 'MIDDLE_PLUS'),
+    ( 'premium', 'premium tariff', 320, 'PREMIUM'),
+    ( 'luxury', 'luxury tariff', 260, 'LUXURY'),
+    ( 'god', 'god tariff', 1400, 'GOD'),
+    ( 'seasonal', 'seasonal tariff', 210, 'SEASONAL'),
+    ( 'special', 'special tariff', 200, 'SPECIAL'),
+    ( 'standard', 'standard tariff', 340, 'STANDARD'),
+    ( 'personal', 'personal tariff', 370, 'PERSONAL'),
+    ( 'profitable', 'profitable tariff', 200, 'PROFITABLE'),
+    ( 'best', 'best tariff', 400, 'BEST'),
+    ( 'economical', 'economical tariff', 200, 'ECONOMICAL'),
+    ( 'children', 'childrens tariff', 420, 'CHILDRENS'),
+    ( 'pro', 'pro tariff', 200, 'PRO'),
+    ( 'trial', 'trial tariff', 450,'TRIAL'),
+    ( 'one_off', ' off tariff', 500, 'ONE_OFF'),
+    ( 'large', 'large tariff', 299, 'LARGE'),
+    ( 'unlimited', 'unlimited tariff', 399, 'UNLIMITED'),
+    ( 'business', 'business tariff', 300, 'BUSINESS');

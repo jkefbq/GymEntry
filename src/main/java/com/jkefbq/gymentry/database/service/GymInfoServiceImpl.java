@@ -6,6 +6,8 @@ import com.jkefbq.gymentry.database.mapper.GymInfoMapper;
 import com.jkefbq.gymentry.database.repository.GymInfoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +17,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GymInfoServiceImpl implements GymInfoService {
 
+    private static final String CACHE_NAMES = "gyms";
     private final GymInfoRepository gymInfoRepository;
     private final GymInfoMapper gymInfoMapper;
 
     @Transactional
+    @CachePut(cacheNames = CACHE_NAMES, unless = "#result == null")
     @Override
     public GymInfoDto save(GymInfoDto dto) {
         GymInfo notSavedEntity = gymInfoMapper.toEntity(dto);
@@ -28,6 +32,7 @@ public class GymInfoServiceImpl implements GymInfoService {
 
     @Transactional
     @Override
+    @Cacheable(cacheNames = CACHE_NAMES)
     public List<String> getAllAddresses() {
         return gymInfoRepository.getAllAddresses();
     }
@@ -37,6 +42,5 @@ public class GymInfoServiceImpl implements GymInfoService {
     public Optional<GymInfoDto> getByAddress(String gymAddress) {
         return gymInfoRepository.getByAddress(gymAddress).map(gymInfoMapper::toDto);
     }
-
 
 }

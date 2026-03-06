@@ -1,6 +1,8 @@
 package com.jkefbq.gymentry.database.mapper;
 
+import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.dto.UserDto;
+import com.jkefbq.gymentry.database.dto.UserWithPassword;
 import com.jkefbq.gymentry.database.entity.User;
 import org.mapstruct.Mapper;
 
@@ -8,4 +10,9 @@ import org.mapstruct.Mapper;
 public interface UserMapper {
     UserDto toDto(User user);
     User toEntity(UserDto dto);
+    User toEntity(UserWithPassword dto);
+    User toEntity(PartialUserDto dto);
+    PartialUserDto toPartialDto(User user);
+    UserWithPassword toDtoWithPassword(User user);
+    UserDto toFullDto(PartialUserDto partial);
 }

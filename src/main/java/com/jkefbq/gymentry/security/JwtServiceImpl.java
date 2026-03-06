@@ -1,13 +1,9 @@
 package com.jkefbq.gymentry.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +14,6 @@ import java.time.ZoneId;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
 
-@Slf4j
 @Service
 public class JwtServiceImpl implements JwtService {
 
@@ -30,33 +25,30 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public TokenPairDto generateTokenPair(String email) {
-        TokenPairDto jwtDto = new TokenPairDto();
-        jwtDto.setAccessToken(generateAccessToken(email));
-        jwtDto.setRefreshToken(generateRefreshToken(email));
-        return jwtDto;
+        TokenPairDto pairDto = new TokenPairDto();
+        pairDto.setAccessToken(generateAccessToken(email));
+        pairDto.setRefreshToken(generateRefreshToken(email));
+        return pairDto;
     }
 
     @Override
     public TokenPairDto refreshAccessTokenAndRotate(String email) {
-        TokenPairDto jwtDto = new TokenPairDto();
-        jwtDto.setAccessToken(generateAccessToken(email));
-        jwtDto.setRefreshToken(generateRefreshToken(email));
-        return jwtDto;
+        TokenPairDto pairDto = new TokenPairDto();
+        pairDto.setAccessToken(generateAccessToken(email));
+        pairDto.setRefreshToken(generateRefreshToken(email));
+        return pairDto;
     }
 
     @Override
-    public boolean isAnyTokenValid(String refreshToken) {
+    public boolean isAnyTokenValid(String token) {
         try {
             Jwts.parser()
                     .verifyWith(getSecretKey())
                     .build()
-                    .parseSignedClaims(refreshToken)
-                    .getPayload();
+                    .parseSignedClaims(token);
             return true;
-        } catch (ExpiredJwtException | UnsupportedJwtException |
-                 MalformedJwtException | SecurityException e) {
-            log.error("exception while validating token: ", e);
-            throw e;
+        } catch (Exception e) {
+            return false;
         }
     }
 

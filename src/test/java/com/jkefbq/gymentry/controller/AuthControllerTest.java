@@ -34,6 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({SecurityConfig.class})
 public class AuthControllerTest {
 
+    private static final String EMAIL = "email@gmail.com";
+    private static final String FIRSTNAME = "firstname";
+    private static final String PASSWORD = "password";
+    private static final String CODE = "123456";
+
     MockMvc mockMvc;
 
     @Autowired
@@ -49,11 +54,6 @@ public class AuthControllerTest {
     MyUserDetailsService myUserDetailsService;
     @MockitoBean
     private UserAuthFacade userAuthFacade;
-
-    private static final String EMAIL = "email@gmail.com";
-    private static final String FIRSTNAME = "firstname";
-    private static final String PASSWORD = "password";
-    private static final String CODE = "123456";
 
     @BeforeEach
     public void setUp() {

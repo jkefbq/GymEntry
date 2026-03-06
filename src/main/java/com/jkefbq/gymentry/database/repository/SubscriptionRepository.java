@@ -14,4 +14,6 @@ public interface SubscriptionRepository extends JpaRepository<@NonNull Subscript
 
     @Query("SELECT s FROM Subscription s WHERE s.purchaseAt >= :from AND s.purchaseAt <= :to")
     List<Subscription> getAllForPeriod(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    List<Subscription> findByUser_Id(UUID userId);
 }

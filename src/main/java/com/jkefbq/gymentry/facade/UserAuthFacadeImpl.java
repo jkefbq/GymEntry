@@ -1,7 +1,8 @@
 package com.jkefbq.gymentry.facade;
 
 import com.jkefbq.gymentry.database.dto.NotVerifiedUserDto;
-import com.jkefbq.gymentry.database.dto.UserDto;
+import com.jkefbq.gymentry.database.dto.PartialUserDto;
+import com.jkefbq.gymentry.database.dto.UserWithPassword;
 import com.jkefbq.gymentry.database.service.NotVerifiedUserService;
 import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.exception.InvalidTokenException;
@@ -14,6 +15,7 @@ import com.jkefbq.gymentry.security.UserCredentialsDto;
 import com.jkefbq.gymentry.security.UserRole;
 import com.jkefbq.gymentry.service.MailService;
 import com.jkefbq.gymentry.service.VerificationCodeService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,9 +36,10 @@ public class UserAuthFacadeImpl implements UserAuthFacade {
     private final JwtService jwtService;
     private final VerificationCodeService verificationCodeService;
 
+    @RateLimiter(name = "register")
     @Override
     @Transactional
-    public void register(NotVerifiedUserDto user) throws UserAlreadyExistsException {
+    public void register(NotVerifiedUserDto user) {
         boolean existsTmp = notVerifiedUserService.existsByEmail(user.getEmail());
         boolean existsCommon = userService.existsByEmail(user.getEmail());
         if (existsTmp || existsCommon) {
@@ -46,6 +49,7 @@ public class UserAuthFacadeImpl implements UserAuthFacade {
         es.execute(() -> mailService.sendConfirmEmail(user.getEmail()));
     }
 
+    @RateLimiter(name = "login")
     @Override
     @Transactional
     public TokenPairDto login(UserCredentialsDto userCredentials) throws AuthenticationException {
@@ -57,6 +61,7 @@ public class UserAuthFacadeImpl implements UserAuthFacade {
     }
 
     @Override
+    @RateLimiter(name = "activate-user")
     @Transactional
     public TokenPairDto activate(String email, String code) throws InvalidVerificationCodeException, TimeoutActivationCodeException {
         if (!verificationCodeService.compareVerificationCode(email, code)) {
@@ -70,18 +75,19 @@ public class UserAuthFacadeImpl implements UserAuthFacade {
         return jwtService.generateTokenPair(email);
     }
 
+    @RateLimiter(name = "refresh")
     @Override
     @Transactional
     public TokenPairDto refresh(String refreshToken) throws InvalidTokenException {
         if (jwtService.isAnyTokenValid(refreshToken)) {
             String email = jwtService.getEmailFromToken(refreshToken);
-            UserDto authenticUser = userService.findByEmail(email)
-                    .orElseThrow(() -> new NoSuchElementException("no user with email " + email));
+            PartialUserDto authenticUser = userService.findByEmail(email).orElseThrow(NoSuchElementException::new);
             return jwtService.refreshAccessTokenAndRotate(authenticUser.getEmail());
         }
         throw new InvalidTokenException("Invalid refresh token");
     }
 
+    @RateLimiter(name = "send-activation-code")
     @Override
     public String resendActivationCode(String email) {
         verificationCodeService.deleteVerificationCode(email);
@@ -90,7 +96,7 @@ public class UserAuthFacadeImpl implements UserAuthFacade {
 
     @Transactional
     public void deleteTmpUserAndCreateCommonUser(NotVerifiedUserDto notVerifiedUser) {
-        var verifiedUser = UserDto.builder()
+        var verifiedUser = UserWithPassword.builder()
                 .firstName(notVerifiedUser.getFirstName())
                 .password(notVerifiedUser.getPassword())
                 .email(notVerifiedUser.getEmail())

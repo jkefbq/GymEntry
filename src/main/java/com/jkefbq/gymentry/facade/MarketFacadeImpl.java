@@ -3,7 +3,7 @@ package com.jkefbq.gymentry.facade;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
 import com.jkefbq.gymentry.database.mapper.SubscriptionMapper;
-import com.jkefbq.gymentry.database.service.SubscriptionService;
+import com.jkefbq.gymentry.database.service.SubscriptionManager;
 import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.dto.SubscriptionRequestDto;
 import com.jkefbq.gymentry.dto.SubscriptionResponseDto;
@@ -23,7 +23,7 @@ public class MarketFacadeImpl implements MarketFacade {
 
     private final SubscriptionPriceCalculator subscriptionPriceCalculator;
     private final UserService userService;
-    private final SubscriptionService subscriptionService;
+    private final SubscriptionManager subscriptionManager;
     private final SubscriptionMapper subscriptionMapper;
 
     @Override
@@ -33,7 +33,7 @@ public class MarketFacadeImpl implements MarketFacade {
                 .orElseThrow(() -> new NoSuchElementException("user with email " + email + " not found"))
                 .getId();
         SubscriptionDto completedDto = mapToSubscriptionDto(requestDto, subscriptionOwnerId);
-        SubscriptionDto savedDto = subscriptionService.create(completedDto);
+        SubscriptionDto savedDto = subscriptionManager.create(completedDto);
         return subscriptionMapper.toResponseDto(savedDto);
     }
 

@@ -1,6 +1,8 @@
 package com.jkefbq.gymentry.database.service;
 
+import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.dto.UserDto;
+import com.jkefbq.gymentry.database.dto.UserWithPassword;
 import com.jkefbq.gymentry.database.entity.User;
 import com.jkefbq.gymentry.database.mapper.UserMapper;
 import com.jkefbq.gymentry.database.mapper.UserMapperImpl;
@@ -47,20 +49,29 @@ public class UserServiceImplTest {
     @InjectMocks
     UserServiceImpl userService;
 
-    public UserDto getUserDto() {
-        return UserDto.builder()
+    public UserWithPassword getUserWithPassword() {
+        return UserWithPassword.builder()
+                .memberSince(LocalDate.now())
+                .role(UserRole.USER)
+                .totalVisits(1)
+                .password("password")
+                .email("email@gmail.com")
+                .build();
+    }
+
+    public PartialUserDto getPartialUser() {
+        return PartialUserDto.builder()
                 .memberSince(LocalDate.now())
                 .role(UserRole.USER)
                 .totalVisits(1)
                 .email("email@gmail.com")
-                .password("password")
                 .build();
     }
 
     @Test
     public void createTest() {
         when(passwordEncoder.encode(any())).thenReturn(UUID.randomUUID().toString());
-        var user = getUserDto();
+        var user = getUserWithPassword();
         user.setMemberSince(LocalDate.now().plusDays(3));
         user.setRole(UserRole.ADMIN);
 
@@ -85,7 +96,6 @@ public class UserServiceImplTest {
         var password = UUID.randomUUID().toString();
         UserDto user = new UserDto();
         user.setPassword(password);
-        doReturn(Optional.of(user)).when(userService).findByEmail(any());
 
         boolean isMatches = userService.isCorrectEmailAndPassword("email", UUID.randomUUID().toString());
 
@@ -95,9 +105,9 @@ public class UserServiceImplTest {
     @Test
     public void isCorrectEmailAndPasswordTest_assertTrue() {
         var password = UUID.randomUUID().toString();
-        UserDto user = new UserDto();
+        UserWithPassword user = new UserWithPassword();
         user.setPassword(password);
-        doReturn(Optional.of(user)).when(userService).findByEmail(any());
+        doReturn(Optional.of(user)).when(userService).findWithPasswordByEmail(any());
         doAnswer(invocation ->
             invocation.getArgument(0).equals(invocation.getArgument(1))
         ).when(passwordEncoder).matches(any(), any());
@@ -118,7 +128,7 @@ public class UserServiceImplTest {
 
     @Test
     public void updateTest() {
-        userService.update(getUserDto());
+        userService.update(getPartialUser());
 
         verify(userRepo).save(any());
     }

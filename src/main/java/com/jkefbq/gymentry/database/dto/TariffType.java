@@ -1,6 +1,8 @@
 package com.jkefbq.gymentry.database.dto;
 
-public enum TariffType {
+import java.io.Serializable;
+
+public enum TariffType implements Serializable {
     BASIC,
     BASIC_PLUS,
     MIDDLE,

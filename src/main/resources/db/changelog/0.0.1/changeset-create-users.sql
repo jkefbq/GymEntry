@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     total_visits INT,
     member_since DATE,
     last_visit DATE,
-    gym_info_id UUID,
-    FOREIGN KEY (gym_info_id) REFERENCES gym_info(id)
+    gym_address VARCHAR,
+    FOREIGN KEY (gym_address) REFERENCES gym_info(address)
 );
 --rollback DROP TABLE users;

@@ -1,15 +1,15 @@
 package com.jkefbq.gymentry.controller;
 
-import com.jkefbq.gymentry.dto.EntryCode;
 import com.jkefbq.gymentry.database.dto.GymInfoDto;
-import com.jkefbq.gymentry.dto.PurchaseStatistics;
 import com.jkefbq.gymentry.database.dto.TariffDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
-import com.jkefbq.gymentry.dto.VisitStatistics;
 import com.jkefbq.gymentry.database.service.GymInfoService;
 import com.jkefbq.gymentry.database.service.TariffService;
+import com.jkefbq.gymentry.dto.EntryCode;
+import com.jkefbq.gymentry.dto.PurchaseStatistics;
+import com.jkefbq.gymentry.dto.VisitStatistics;
+import com.jkefbq.gymentry.exception.InvalidSubscriptionException;
 import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
-import com.jkefbq.gymentry.exception.VisitsAreOverException;
 import com.jkefbq.gymentry.facade.AdminStatisticsFacade;
 import com.jkefbq.gymentry.facade.GymEntryFacade;
 import jakarta.validation.Valid;
@@ -47,7 +47,7 @@ public class AdminController {
 
     @PostMapping("/confirm-entry")
     public ResponseEntity<@NonNull String> confirmEntry(
-            @AuthenticationPrincipal UserDetails userDetails, @RequestBody @Valid EntryCode code, @RequestParam String gymAddress) throws VisitsAreOverException, NonActiveSubscriptionException {
+            @AuthenticationPrincipal UserDetails userDetails, @RequestBody @Valid EntryCode code, @RequestParam String gymAddress) throws NonActiveSubscriptionException, InvalidSubscriptionException {
         log.info("call /admin/confirm-entry");
         gymEntryFacade.confirmEntry(code.getCode(), userDetails.getUsername(), gymAddress);
         return ResponseEntity.ok("Успех! посетитель может идти на тренировку");

@@ -51,10 +51,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public TokenPairDto signIn(@RequestBody @Valid UserCredentialsDto userCredentials) throws AuthenticationException {
+    public TokenPairDto login(@RequestBody @Valid UserCredentialsDto userCredentials) throws AuthenticationException {
         log.info("call /login for user with email {}", userCredentials.getEmail());
         return userAuthFacade.login(userCredentials);
     }
+
 
     @PostMapping("/refresh")
     public TokenPairDto refresh(@RequestBody RefreshTokenDto refreshTokenDto) throws InvalidTokenException {

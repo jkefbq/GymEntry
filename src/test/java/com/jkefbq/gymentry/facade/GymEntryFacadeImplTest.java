@@ -1,92 +1,153 @@
 package com.jkefbq.gymentry.facade;
 
 import com.jkefbq.gymentry.database.dto.GymInfoDto;
+import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
-import com.jkefbq.gymentry.database.dto.TariffType;
-import com.jkefbq.gymentry.database.dto.UserDto;
+import com.jkefbq.gymentry.database.dto.VisitDto;
 import com.jkefbq.gymentry.database.service.GymInfoService;
-import com.jkefbq.gymentry.database.service.SubscriptionService;
+import com.jkefbq.gymentry.database.service.SubscriptionManager;
 import com.jkefbq.gymentry.database.service.UserService;
-import com.jkefbq.gymentry.database.service.VisitService;
+import com.jkefbq.gymentry.database.service.VisitManager;
 import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
-import com.jkefbq.gymentry.exception.VisitsAreOverException;
 import com.jkefbq.gymentry.service.EntryCodeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GymEntryFacadeImplTest {
 
+    private static final String MOCK_EMAIL = "email@gmail.com";
+
     @Mock
     UserService userService;
     @Mock
     EntryCodeService entryCodeService;
     @Mock
-    SubscriptionService subscriptionService;
+    SubscriptionManager subscriptionManager;
     @Mock
     GymInfoService gymInfoService;
     @Mock
-    VisitService visitService;
+    VisitManager visitManager;
 
+    @Spy
     @InjectMocks
     GymEntryFacadeImpl gymEntryFacade;
 
-    private static final String MOCK_EMAIL = "email@gmail.com";
-
     @Test
-    public void tryEntryTest_withoutThrow() throws NonActiveSubscriptionException, VisitsAreOverException {
+    public void tryEntryTest() {
+        when(userService.findByEmail(MOCK_EMAIL)).thenReturn(Optional.of(PartialUserDto.builder().id(UUID.randomUUID()).build()));
+        when(subscriptionManager.getUserSubs(any())).thenReturn(List.of());
+        when(subscriptionManager.getActiveSubscription(any())).thenReturn(new SubscriptionDto());
+        doNothing().when(gymEntryFacade).checkAllSubs(any());
+        doNothing().when(subscriptionManager).checkActiveSub(any());
+
         gymEntryFacade.tryEntry(MOCK_EMAIL);
 
-        verify(subscriptionService).validateAndGetActiveSubscription(MOCK_EMAIL);
+        verify(subscriptionManager).getActiveSubscription(any());
         verify(entryCodeService).generateUserEntryCode(MOCK_EMAIL);
     }
 
     @Test
-    public void tryEntryTest_throwNonActiveSubscriptionException_withSingleSubscription() throws NonActiveSubscriptionException, VisitsAreOverException {
-        when(subscriptionService.validateAndGetActiveSubscription(MOCK_EMAIL)).thenThrow(NonActiveSubscriptionException.class);
-        when(userService.findByEmail(MOCK_EMAIL)).thenReturn(Optional.of(UserDto.builder().subscriptions(List.of(new SubscriptionDto())).build()));
+    public void confirmEntryTest() {
+        var entryCode = RandomStringUtils.randomNumeric(6);
+        doAnswer(invocation -> SubscriptionDto.builder().active(true).build()).when(gymEntryFacade).findAndDecrementSub(entryCode);
+        doAnswer(invocation -> new PartialUserDto()).when(gymEntryFacade).refreshUser(MOCK_EMAIL);
+        doNothing().when(gymEntryFacade).createVisit(any(), any());
 
-        gymEntryFacade.tryEntry(MOCK_EMAIL);
+        gymEntryFacade.confirmEntry(entryCode, MOCK_EMAIL, "address");
 
-        verify(subscriptionService).validateAndGetActiveSubscription(MOCK_EMAIL);
-        verify(subscriptionService).activateSubscription(eq(MOCK_EMAIL), any());
-    }
-
-    @Test
-    public void confirmEntry() throws NonActiveSubscriptionException, VisitsAreOverException {
-        when(subscriptionService.validateAndGetActiveSubscription(any())).thenReturn(SubscriptionDto.builder().visitsTotal(10).tariffType(TariffType.BASIC).visitsLeft(6).build());
-        when(userService.findByEmail(MOCK_EMAIL)).thenReturn(Optional.of(UserDto.builder().totalVisits(1).build()));
-        when(gymInfoService.getByAddress(any())).thenReturn(Optional.of(new GymInfoDto()));
-
-        gymEntryFacade.confirmEntry("12345", MOCK_EMAIL, "address");
-
-        verify(visitService).create(any());
+        verify(gymEntryFacade).findAndDecrementSub(entryCode);
+        verify(gymEntryFacade).refreshUser(MOCK_EMAIL);
+        verify(gymEntryFacade).createVisit(any(), any());
         verify(userService).update(any());
-        verify(subscriptionService).update(any());
+        verify(subscriptionManager).update(any());
     }
 
     @Test
-    public void validateSubscriptionAndDecrementVisitsTest() throws NonActiveSubscriptionException, VisitsAreOverException {
-        var code = "123456";
-        var email = "email";
-        var visitsLeft = 5;
-        when(entryCodeService.getEmailByCode(code)).thenReturn(email);
-        when(subscriptionService.validateAndGetActiveSubscription(email)).thenReturn(SubscriptionDto.builder().visitsLeft(visitsLeft).build());
+    public void refreshUserTest() {
+        var totalVisitsBefore = 10;
+        when(userService.findByEmail(MOCK_EMAIL))
+                .thenReturn(Optional.of(PartialUserDto.builder().totalVisits(totalVisitsBefore).build()));
 
-        SubscriptionDto sub = gymEntryFacade.validateSubscriptionAndDecrementVisits(code);
+        var user = gymEntryFacade.refreshUser(MOCK_EMAIL);
 
-        assertEquals(visitsLeft - 1, sub.getVisitsLeft());
+        assertEquals(totalVisitsBefore + 1, user.getTotalVisits());
+        assertEquals(LocalDate.now(), user.getLastVisit());
     }
+
+    @Test
+    public void findAndDecrementSubTest() {
+        var entryCode = RandomStringUtils.randomNumeric(6);
+        var visitsLeft = 10;
+        var sub = SubscriptionDto.builder().active(true).visitsLeft(visitsLeft).visitsTotal(12).build();
+        doAnswer(invocation -> sub).when(gymEntryFacade).findActiveSubscription(entryCode);
+
+        var decrementSub = gymEntryFacade.findAndDecrementSub(entryCode);
+
+        assertEquals(visitsLeft, decrementSub.getVisitsLeft() + 1);
+    }
+
+    @Test
+    public void findActiveSubscriptionTest() {
+        var entryCode = RandomStringUtils.randomNumeric(6);
+        when(userService.findByEmail(any())).thenReturn(Optional.of(new PartialUserDto()));
+
+        gymEntryFacade.findActiveSubscription(entryCode);
+
+        verify(entryCodeService).getEmailByCode(entryCode);
+        verify(userService).findByEmail(any());
+        verify(subscriptionManager).getActiveSubscription(any());
+    }
+
+    @Test
+    public void createVisitTest() {
+        ArgumentCaptor<VisitDto> captor = ArgumentCaptor.forClass(VisitDto.class);
+        var activeSub = SubscriptionDto.builder().active(true).build();
+        var gym = new GymInfoDto("address");
+        when(gymInfoService.getByAddress(gym.getAddress())).thenReturn(Optional.of(gym));
+
+        gymEntryFacade.createVisit(gym.getAddress(), activeSub);
+
+        verify(gymInfoService).getByAddress(gym.getAddress());
+        verify(visitManager).create(captor.capture());
+        assertEquals(activeSub, captor.getValue().getSubscription());
+        assertEquals(gym, captor.getValue().getGym());
+        assertEquals(LocalDate.now(), captor.getValue().getCreatedAt().toLocalDate());
+    }
+
+    @Test
+    public void checkAllSubsTest_nonActiveSubs() {
+        var subs = List.of(SubscriptionDto.builder().active(false).build(),
+                SubscriptionDto.builder().active(false).build(), SubscriptionDto.builder().active(false).build());
+
+        assertThrows(NonActiveSubscriptionException.class, () -> gymEntryFacade.checkAllSubs(subs));
+    }
+
+    @Test
+    public void checkAllSubsTest_manyActiveSubs() {
+        var subs = List.of(SubscriptionDto.builder().active(true).build(),
+                SubscriptionDto.builder().active(true).build(), SubscriptionDto.builder().active(false).build());
+
+        assertThrows(IllegalStateException.class, () -> gymEntryFacade.checkAllSubs(subs));
+    }
+
 }

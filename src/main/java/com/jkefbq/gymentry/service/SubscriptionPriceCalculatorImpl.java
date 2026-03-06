@@ -4,6 +4,7 @@ import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.dto.TariffDto;
 import com.jkefbq.gymentry.database.service.TariffService;
 import com.jkefbq.gymentry.database.dto.TariffType;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ public class SubscriptionPriceCalculatorImpl implements SubscriptionPriceCalcula
     private final TariffService tariffService;
 
     @Override
+    @Transactional
     public BigDecimal calculate(SubscriptionDto subscriptionDto) {
         TariffDto tariffDto = tariffService.getByType(subscriptionDto.getTariffType())
                 .orElseThrow(() -> new NoSuchElementException("tariff with type " + subscriptionDto.getTariffType() + " not found"));
@@ -26,6 +28,7 @@ public class SubscriptionPriceCalculatorImpl implements SubscriptionPriceCalcula
     }
 
     @Override
+    @Transactional
     public BigDecimal calculate(TariffType tariffType, Integer visitsCount) {
         TariffDto tariffDto = tariffService.getByType(tariffType)
                 .orElseThrow(() -> new NoSuchElementException("tariff with type " + tariffType + " not found"));

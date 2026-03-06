@@ -1,11 +1,12 @@
 package com.jkefbq.gymentry.facade;
 
+import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
-import com.jkefbq.gymentry.database.dto.UserDto;
 import com.jkefbq.gymentry.database.mapper.SubscriptionMapper;
 import com.jkefbq.gymentry.database.mapper.SubscriptionMapperImpl;
-import com.jkefbq.gymentry.database.service.SubscriptionService;
+import com.jkefbq.gymentry.database.service.SubscriptionAnalytics;
+import com.jkefbq.gymentry.database.service.SubscriptionManager;
 import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.dto.SubscriptionRequestDto;
 import com.jkefbq.gymentry.service.SubscriptionPriceCalculator;
@@ -33,7 +34,9 @@ public class MarketFacadeImplTest {
     @Mock
     UserService userService;
     @Mock
-    SubscriptionService subscriptionService;
+    SubscriptionAnalytics subscriptionAnalytics;
+    @Mock
+    SubscriptionManager subscriptionManager;
     @Spy
     SubscriptionMapper subscriptionMapper = new SubscriptionMapperImpl();
 
@@ -42,13 +45,13 @@ public class MarketFacadeImplTest {
 
     @Test
     public void createTest() {
-        when(userService.findByEmail(any())).thenReturn(Optional.of(UserDto.builder().id(UUID.randomUUID()).build()));
+        when(userService.findByEmail(any())).thenReturn(Optional.of(PartialUserDto.builder().id(UUID.randomUUID()).build()));
         SubscriptionRequestDto request = new SubscriptionRequestDto(12, TariffType.BASIC);
         var email = "email";
 
         marketFacade.create(request, email);
 
-        verify(subscriptionService).create(any());
+        verify(subscriptionManager).create(any());
         verify(subscriptionMapper).toResponseDto(any());
     }
 

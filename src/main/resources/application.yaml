@@ -6,11 +6,6 @@ spring:
     username: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
-  kafka:
-    bootstrap-servers: 'localhost:9092'
-    consumer:
-      group-id: my-group
-      auto-offset-reset: earliest
   jpa:
     hibernate:
       ddl-auto: none
@@ -19,6 +14,7 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      timeout: 1s
   cache:
     type: redis
   liquibase:
@@ -42,11 +38,34 @@ spring:
             required: true
         ssl:
           trust: "smtp.gmail.com"
+resilience4j.ratelimiter:
+  instances:
+    register:
+      limitForPeriod: 5
+      limit-refresh-period: 5m
+      timeoutDuration: 0s
+      writable-stack-trace-enabled: false
+    login:
+      limitForPeriod: 7
+      limit-refresh-period: 6m
+      timeoutDuration: 0s
+      writable-stack-trace-enabled: false
+    activate-user:
+      limitForPeriod: 3
+      limit-refresh-period: 5m
+      timeoutDuration: 0s
+      writable-stack-trace-enabled: false
+    refresh:
+      limitForPeriod: 4
+      limit-refresh-period: 5m
+      timeoutDuration: 0s
+      writable-stack-trace-enabled: false
+    send-activation-code:
+      limitForPeriod: 1
+      limit-refresh-period: 4m
+      timeoutDuration: 0s
+      writable-stack-trace-enabled: false
 
 app:
-  kafka:
-    bootstrap-servers-config: ${spring.kafka.bootstrap-servers}
-    topics:
-      visits: visits
   auth:
     encryption-key: ${ENCRYPTION_AUTH_KEY}

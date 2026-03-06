@@ -1,7 +1,7 @@
 package com.jkefbq.gymentry.controller;
 
-import com.jkefbq.gymentry.database.dto.UserDto;
-import com.jkefbq.gymentry.database.service.SubscriptionService;
+import com.jkefbq.gymentry.database.dto.PartialUserDto;
+import com.jkefbq.gymentry.database.service.SubscriptionManager;
 import com.jkefbq.gymentry.database.service.UserServiceImpl;
 import com.jkefbq.gymentry.facade.GymEntryFacade;
 import com.jkefbq.gymentry.security.JwtFilter;
@@ -59,13 +59,12 @@ public class EntryControllerTest {
     @MockitoBean
     GymEntryFacade gymEntryFacade;
     @MockitoBean
-    private SubscriptionService subscriptionService;
+    private SubscriptionManager subscriptionService;
 
-    public UserDto getUserDto() {
-        return UserDto.builder()
+    public PartialUserDto getPartialUser() {
+        return PartialUserDto.builder()
                 .id(UUID.randomUUID())
                 .email("email")
-                .password("password")
                 .firstName("firstname")
                 .build();
     }
@@ -97,7 +96,7 @@ public class EntryControllerTest {
     @Test
     @WithMockUser
     public void getUserInfoTest() throws Exception {
-        UserDto user = getUserDto();
+        PartialUserDto user = getPartialUser();
         when(userService.findByEmail(any())).thenReturn(Optional.ofNullable(user));
         mockMvc.perform(get("/user/me"))
                 .andExpect(status().isOk())
@@ -106,20 +105,11 @@ public class EntryControllerTest {
 
     @Test
     @WithMockUser
-    public void getAllSubscriptionsTest() throws Exception {
-        UserDto user = getUserDto();
-        when(userService.findByEmail(any())).thenReturn(Optional.ofNullable(user));
-        mockMvc.perform(get("/user/subscriptions"))
-                .andExpect(status().isOk());
-        verify(subscriptionService).getAllSubscriptions(any());
-    }
-
-    @Test
-    @WithMockUser
     public void getActiveSubscriptionTest() throws Exception {
+        when(userService.findByEmail(any())).thenReturn(Optional.ofNullable(getPartialUser()));
         mockMvc.perform(get("/user/subscriptions/active"))
                 .andExpect(status().isOk());
-        verify(subscriptionService).validateAndGetActiveSubscription(any());
+        verify(subscriptionService).getActiveSubscription(any());
     }
 
     @Test
@@ -129,6 +119,6 @@ public class EntryControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(UUID.randomUUID()))
         ).andExpect(status().isOk());
-        verify(subscriptionService).activateSubscription(any(), any());
+        verify(subscriptionService).activateSubscription(any());
     }
 }

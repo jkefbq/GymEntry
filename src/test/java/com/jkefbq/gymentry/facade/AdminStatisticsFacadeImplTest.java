@@ -3,8 +3,10 @@ package com.jkefbq.gymentry.facade;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
 import com.jkefbq.gymentry.database.dto.VisitDto;
-import com.jkefbq.gymentry.database.service.SubscriptionService;
-import com.jkefbq.gymentry.database.service.VisitService;
+import com.jkefbq.gymentry.database.service.SubscriptionAnalytics;
+import com.jkefbq.gymentry.database.service.SubscriptionManager;
+import com.jkefbq.gymentry.database.service.VisitAnalytics;
+import com.jkefbq.gymentry.database.service.VisitManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,15 +26,19 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class AdminStatisticsFacadeImplTest {
 
+    private static final String MOCK_ADDRESS = "address";
+
     @Mock
-    VisitService visitService;
+    VisitManager visitManager;
     @Mock
-    SubscriptionService subscriptionService;
+    VisitAnalytics visitAnalytics;
+    @Mock
+    SubscriptionAnalytics subscriptionAnalytics;
+    @Mock
+    SubscriptionManager subscriptionManager;
 
     @InjectMocks
     AdminStatisticsFacadeImpl adminStat;
-
-    private static final String MOCK_ADDRESS = "address";
 
     public List<VisitDto> getVisits() {
         var visit = VisitDto.builder().createdAt(LocalDateTime.now()).id(UUID.randomUUID()).build();
@@ -51,14 +57,14 @@ public class AdminStatisticsFacadeImplTest {
         var to = LocalDateTime.now();
         var wholeDays = ChronoUnit.DAYS.between(from, to);
         var visits = getVisits();
-        when(visitService.getAllForPeriod(from, to, MOCK_ADDRESS)).thenReturn(visits);
+        when(visitManager.getAllForPeriod(from, to, MOCK_ADDRESS)).thenReturn(visits);
 
         adminStat.getVisitStatisticsForPeriod(from, to, MOCK_ADDRESS);
 
-        verify(visitService).getAvgPerDay(visits.size(), wholeDays);
-        verify(visitService).getPeakDay(visits);
-        verify(visitService).getVisitsPerDate(visits);
-        verify(visitService).getTariffsPerDate(visits);
+        verify(visitAnalytics).getAvgPerDay(visits.size(), wholeDays);
+        verify(visitAnalytics).getPeakDay(visits);
+        verify(visitAnalytics).getVisitsPerDate(visits);
+        verify(visitAnalytics).getTariffsPerDate(visits);
     }
 
     @Test
@@ -67,15 +73,15 @@ public class AdminStatisticsFacadeImplTest {
         var to = LocalDate.now();
         var wholeDays = ChronoUnit.DAYS.between(from, to);
         var subscriptions = getSubscriptions();
-        when(subscriptionService.getAllForPeriod(from, to)).thenReturn(subscriptions);
+        when(subscriptionManager.getAllForPeriod(from, to)).thenReturn(subscriptions);
 
         adminStat.getPurchaseStatisticsForPeriod(from, to);
 
-        verify(subscriptionService).getTotalRevenue(subscriptions);
-        verify(subscriptionService).getAvgDayCheck(subscriptions, wholeDays);
-        verify(subscriptionService).getAvgPerPersonCheck(subscriptions);
-        verify(subscriptionService).getPeakDay(subscriptions);
-        verify(subscriptionService).getPurchasesPerDate(subscriptions);
-        verify(subscriptionService).getPurchasesPerTariff(subscriptions);
+        verify(subscriptionAnalytics).getTotalRevenue(subscriptions);
+        verify(subscriptionAnalytics).getAvgDayCheck(subscriptions, wholeDays);
+        verify(subscriptionAnalytics).getAvgPerPurchaseCheck(subscriptions);
+        verify(subscriptionAnalytics).getPeakDay(subscriptions);
+        verify(subscriptionAnalytics).getPurchasesPerDate(subscriptions);
+        verify(subscriptionAnalytics).getPurchasesPerTariff(subscriptions);
     }
 }

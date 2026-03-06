@@ -51,6 +51,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({SecurityConfig.class})
 public class AdminControllerTest {
 
+    private static final String GYM_ADDRESS_PARAM = "gymAddress";
+    private static final String STATISTICS_FROM_PARAM = "from";
+    private static final String STATISTICS_TO_PARAM = "to";
+    private static final String GYM_ADDRESS = "г.Рандомный ул.адрес д.5";
+    private static final EntryCode ENTRY_CODE = new EntryCode("123456");
+
     MockMvc mockMvc;
 
     @Autowired
@@ -72,13 +78,6 @@ public class AdminControllerTest {
     MyUserDetailsService myUserDetailsService;
     @MockitoBean
     GymEntryFacade gymEntryFacade;
-
-
-    private static final String GYM_ADDRESS_PARAM = "gymAddress";
-    private static final String STATISTICS_FROM_PARAM = "from";
-    private static final String STATISTICS_TO_PARAM = "to";
-    private static final String GYM_ADDRESS = "г.Рандомный ул.адрес д.5";
-    private static final EntryCode ENTRY_CODE = new EntryCode("123456");
 
     @BeforeEach
     public void setUp() throws ServletException, IOException {

@@ -16,7 +16,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public @NonNull UserDetails loadUserByUsername(@NonNull String email) throws UsernameNotFoundException {
-        return userService.findByEmail(email)
+        return userService.findWithPasswordByEmail(email)
                 .map(CustomUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("not found user with email: '%s'".formatted(email)));
     }
