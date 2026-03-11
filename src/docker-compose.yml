@@ -21,6 +21,15 @@ services:
     ports:
       - '6379:6379'
 
+  app:
+    container_name: gymentry-app
+    image: gymentry:latest
+    restart: on-failure:2
+    env_file:
+      - .env
+    ports:
+      - '8080:8080'
+
 volumes:
   pg-data:
   redis-data:
