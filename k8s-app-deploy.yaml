@@ -6,6 +6,10 @@ metadata:
   labels:
     app: gymentry-app
 spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 75%
   replicas: 3
   selector:
     matchLabels:
