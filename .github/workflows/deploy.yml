@@ -1,0 +1,27 @@
+name: deploy.yml
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: checkout
+        uses: actions/checkout@v6
+      - name: GHCR login
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: build-push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
+      - name: refresh k8s deployment
+        run: | 
+          kubectl set image deployment/gymentry-app gymentry-app=ghcr.io/${{ github.repository }}:${{ github.sha }}
+          kubectl rollout status deployment/gymentry-app --timeout=60s
