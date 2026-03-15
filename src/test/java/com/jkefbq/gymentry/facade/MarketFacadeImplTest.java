@@ -1,27 +1,19 @@
 package com.jkefbq.gymentry.facade;
 
-import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
-import com.jkefbq.gymentry.database.mapper.SubscriptionMapper;
-import com.jkefbq.gymentry.database.mapper.SubscriptionMapperImpl;
-import com.jkefbq.gymentry.database.service.SubscriptionAnalytics;
-import com.jkefbq.gymentry.database.service.SubscriptionManager;
-import com.jkefbq.gymentry.database.service.UserService;
+import com.jkefbq.gymentry.dto.PurchaseDto;
 import com.jkefbq.gymentry.dto.SubscriptionRequestDto;
+import com.jkefbq.gymentry.service.MessageProducer;
 import com.jkefbq.gymentry.service.SubscriptionPriceCalculator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MarketFacadeImplTest {
@@ -29,27 +21,23 @@ public class MarketFacadeImplTest {
     @Mock
     SubscriptionPriceCalculator subscriptionPriceCalculator;
     @Mock
-    UserService userService;
-    @Mock
-    SubscriptionAnalytics subscriptionAnalytics;
-    @Mock
-    SubscriptionManager subscriptionManager;
-    @Spy
-    SubscriptionMapper subscriptionMapper = new SubscriptionMapperImpl();
+    MessageProducer messageProducer;
 
     @InjectMocks
     MarketFacadeImpl marketFacade;
 
     @Test
     public void createTest() {
-        when(userService.findByEmail(any())).thenReturn(Optional.of(PartialUserDto.builder().id(UUID.randomUUID()).build()));
+        ArgumentCaptor<PurchaseDto> captor = ArgumentCaptor.forClass(PurchaseDto.class);
         SubscriptionRequestDto request = new SubscriptionRequestDto(12, TariffType.BASIC);
         var email = "email";
 
         marketFacade.create(request, email);
 
-        verify(subscriptionManager).create(any());
-        verify(subscriptionMapper).toResponseDto(any());
+        verify(messageProducer).sendSubscriptionPurchase(captor.capture());
+        assertEquals(request.getVisitsTotal(), captor.getValue().getVisitsTotal());
+        assertEquals(request.getTariffType(), captor.getValue().getTariffType());
+        assertEquals(email, captor.getValue().getOwnerEmail().getEmail());
     }
 
     @Test
