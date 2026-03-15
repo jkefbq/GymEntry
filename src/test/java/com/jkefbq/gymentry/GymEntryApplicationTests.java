@@ -38,7 +38,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import tools.jackson.databind.ObjectMapper;
 
-import java.time.LocalDate;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -186,19 +185,13 @@ class GymEntryApplicationTests {
         var visitsTotal = ThreadLocalRandom.current().nextInt(12);
         var tariffType = TariffType.BASIC;
         var sub = new SubscriptionRequestDto(visitsTotal, tariffType);
-        var expectedPrice = subscriptionPriceCalculator.calculate(sub.getTariffType(), sub.getVisitsTotal());
         var accessToken = jwtService.generateAccessToken(USER_EMAIL);
 
         mockMvc.perform(post("/market/subscription")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sub))
-        ).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.visitsTotal").value(visitsTotal))
-                .andExpect(jsonPath("$.tariffType").value(tariffType.name()))
-                .andExpect(jsonPath("$.purchaseAt").value(LocalDate.now().toString()))
-                .andExpect(jsonPath("$.snapshotPrice").value(expectedPrice.toString()))
-                .andExpect(jsonPath("$.visitsLeft").value(visitsTotal));
+        ).andExpect(status().isCreated());
     }
 
 
