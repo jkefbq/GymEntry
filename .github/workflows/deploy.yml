@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'README.md'
+      - 'src/main/resources/pictures'
+      - '.env.example'
 permissions:
   contents: read
   packages: write

@@ -1,5 +1,10 @@
 name: build-test
-on: [pull_request]
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'src/main/resources/pictures'
+      - '.env.example'
 jobs:
   build:
     runs-on: self-hosted
