@@ -1,103 +1,90 @@
 # GymEntry — Пропускная система для спортзала
-
-![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?logo=postgresql)
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.2-green?logo=springboot)
 ![Redis](https://img.shields.io/badge/Redis-Cache-DC382D?logo=redis)
-![Kafka](https://img.shields.io/badge/Kafka-Event%20Bus-231F20?logo=apachekafka)
-![Kubernetes](https://img.shields.io/badge/K8s-Deployed-326CE5?logo=kubernetes)
-![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)
-![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions)
-![Tests](https://img.shields.io/badge/Coverage-в%20процессе-yellow)
-
-Полноценная **production-ready** пропускная система для сети спортзалов. Пользователь заходит на сайт, нажимает «Войти» — получает одноразовый код, диктует его администратору на входе. Администратор подтверждает вход через свою панель. Никаких карт, никаких турникетов — только браузер и код.
-
-> **За этим простым UX скрывает** JWT-авторизация, Redis-кэширование, Rate Limiter на email-коды, асинхронное взаимодействие с микросервисом оплаты через Kafka, деплой в Kubernetes и полный CI/CD pipeline на GitHub Actions.
-
----
-
-## 🖼 Скриншоты
-
+![Kafka](https://img.shields.io/badge/Kafka-Event%20Bus-yellow?logo=apachekafka)
+![Kubernetes](https://img.shields.io/badge/k8s-Deployed-7B42BC?logo=kubernetes)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-lightgrey?logo=githubactions)
+![Tests](https://img.shields.io/badge/Coverage-85%25-yellow)  
+Пропускная система для спортзала с JWT-авторизацией, подтверждением входа по email и real-time аналитикой в админ-панели. Реализована на микросервисной архитектуре с асинхронным взаимодействием через Kafka, кэшированием, многопоточностью, интеграционными тестами и деплоем в Kubernetes.
+<details>
+<summary>подробнее</summary>  
+<br>
 <table>
-  <tr>
-    <td><b>Главная — активный абонемент и кнопка входа</b></td>
-    <td><b>Маркет — выбор тарифа</b></td>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/placeholder-1" width="100%"/></td>
-    <td><img src="https://github.com/user-attachments/assets/placeholder-2" width="100%"/></td>
-  </tr>
-  <tr>
-    <td><b>Мои абонементы</b></td>
-    <td><b>Профиль пользователя</b></td>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/placeholder-3" width="100%"/></td>
-    <td><img src="https://github.com/user-attachments/assets/placeholder-4" width="100%"/></td>
-  </tr>
-  <tr>
-    <td colspan="2"><b>Панель администратора — статистика и аналитика</b></td>
-  </tr>
-  <tr>
-    <td colspan="2"><img src="https://github.com/user-attachments/assets/placeholder-5" width="100%"/></td>
-  </tr>
+  <thead>
+    <tr>
+      <th width="30%">Функциональный блок</th>
+      <th width="70%">Описание и возможности</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Проход в зал</b></td>
+      <td>
+        Пользователь нажимает кнопку <b>«Войти»</b> — система генерирует одноразовый код действительный в течении 5 минут. Код диктуется администратору на входе, тот подтверждает проход через панель. Посещение автоматически списывается с активного абонемента.
+      </td>
+    </tr>
+    <tr>
+      <td><b>Управление абонементами</b></td>
+      <td>
+        Покупка абонементов через маркет с интерактивным слайдером количества занятий и расчётом итоговой стоимости в реальном времени. Одновременно активен только один абонемент — переключение между купленными в один клик.
+      </td>
+    </tr>
+    <tr>
+      <td><b>Панель администратора</b></td>
+      <td>
+        <b>Аналитика за произвольный период</b> по конкретному залу. Статистика посещений: кол-во, среднее в день, пик, графики по дням и типам абонементов. Статистика покупок: выручка, средний чек, пик, графики по дням и тарифам. Управление тарифами — изменение цен мгновенно отражается в маркете.
+      </td>
+    </tr>
+    <tr>
+      <td><b>Микросервис оплаты</b></td>
+      <td>
+        Покупка абонемента публикует событие в <b>Kafka</b>. Payment-микросервис обрабатывает его асинхронно и независимо от основного приложения — слабая связность и устойчивость к временной недоступности платёжного сервиса.
+      </td>
+    </tr>
+    <tr>
+      <td><b>DevOps & CI/CD</b></td>
+      <td>
+        Принцип <b>Cloud Native</b>. При Pull Request — автоматический билд и тесты через <b>GitHub Actions</b>. При пуше в <code>main</code> — автодеплой в <b>Kubernetes</b>. Фронтенд и бэкенд в одном кластере.
+      </td>
+    </tr>
+    <tr>
+      <td><b>Качество и тестирование</b></td>
+      <td>
+        Стабильность подтверждена Unit и интеграционными тестами с <b>TestContainers</b> — реальные PostgreSQL и Redis в контейнерах без моков инфраструктуры. Асинхронные сценарии верифицированы через <b>Awaitility</b>.
+        <br> - <b>Service+Facade Layer:</b> 84%
+        <br> - <b>Controller Layer:</b> 89%
+      </td>
+    </tr>
+  </tbody>
 </table>
+</details>
+<details>
+  <summary>фотки</summary>
+  <img src="" width="48%"> <img src="" width="50%">
+</details>
 
----
+## 🛠 Технологии
+### приложение:
+- Spring Boot (Security, Web, Data, Cache, Kafka)
+- PostgreSQL
+- Redis
+- Kubernetes
+- Kafka
+- Docker
+- Liquibase
+- Swagger
+- Jwt auth
+- MapStruct
+- GitHub Actions
+- Lombok
+### тесты:
+- JUnit
+- Mockito
+- TestContainers
+- Awaitility
 
-## ⚙️ Архитектура
-
-```mermaid
-graph TB
-    subgraph Client["🌐 Клиент"]
-        FE["Frontend (SPA)"]
-    end
-
-    subgraph Backend["☕ Backend — Spring Boot"]
-        GW["REST API / Controllers"]
-        AUTH["JWT Auth Filter"]
-        SVC["Service Layer"]
-        CACHE["Redis Cache"]
-        RL["Rate Limiter\n(email-коды)"]
-        KPROD["Kafka Producer"]
-    end
-
-    subgraph Infra["🗄️ Инфраструктура"]
-        PG[("PostgreSQL")]
-        REDIS[("Redis")]
-        LQ["Liquibase\nMigrations"]
-    end
-
-    subgraph Microservices["📦 Микросервисы"]
-        PAY["Payment Service\n(mock)"]
-        KAFKA["Apache Kafka"]
-        MAIL["Email Service"]
-    end
-
-    subgraph DevOps["🚀 DevOps"]
-        GHA["GitHub Actions\nCI/CD"]
-        K8S["Kubernetes\nCluster"]
-    end
-
-    FE -->|HTTPS| GW
-    GW --> AUTH
-    AUTH --> SVC
-    SVC --> CACHE
-    SVC --> RL
-    SVC --> KPROD
-    CACHE <--> REDIS
-    SVC <--> PG
-    LQ --> PG
-    KPROD --> KAFKA
-    KAFKA --> PAY
-    RL --> MAIL
-    GHA -->|"PR: build + test"| Backend
-    GHA -->|"push main: deploy"| K8S
-    K8S --> Backend
-    K8S --> FE
-```
-
----
 
 ## 🚀 Функциональность
 
@@ -185,24 +172,7 @@ graph TB
 </table>
 </details>
 
----
-
-## 🛠 Стек технологий
-
-### Backend
-| Категория | Технологии |
-|---|---|
-| **Core** | Java 21, Spring Boot 3, Spring Web, Spring Data JPA |
-| **Безопасность** | Spring Security, JWT, Rate Limiter (email-коды) |
-| **База данных** | PostgreSQL, Liquibase (миграции), MapStruct, Lombok |
-| **Кэширование** | Redis (Graceful Degradation при сбое) |
-| **Сообщения** | Apache Kafka (интеграция с payment-микросервисом) |
-| **DevOps** | Docker, Kubernetes, GitHub Actions CI/CD |
-| **Тесты** | JUnit, Mockito, TestContainers, Awaitility, Liquibase |
-
----
-
-## ⚡ Технические аспекты
+## ⚙ Технические аспекты и архитектура
 
 <table>
   <thead>
@@ -213,9 +183,9 @@ graph TB
   </thead>
   <tbody>
     <tr>
-      <td><b>JWT-авторизация</b></td>
+      <td><b>Безопасность</b></td>
       <td>
-        Stateless аутентификация через JWT. Токены верифицируются на уровне Spring Security фильтра до попадания в бизнес-логику. Роли пользователя и администратора разграничены на уровне методов (<code>@PreAuthorize</code>).
+        Аутентификация через JWT. Доступ к ресурсам разграничен не только на уровне контроллера, но и на уровне методов <code>@PreAuthorize</code>.Конфиденциальные данные (API-ключи, учетные данные БД) вынесены в переменные окружения с использованием <code>.env.example</code> (в корне) для стандартизации.
       </td>
     </tr>
     <tr>
@@ -231,7 +201,7 @@ graph TB
       </td>
     </tr>
     <tr>
-      <td><b>Rate Limiter</b></td>
+      <td><b>Email-код на вход</b></td>
       <td>
         Коды подтверждения входа отправляются на email. Встроенный Rate Limiter защищает от брутфорса и злоупотреблений — ограничивает частоту генерации кодов на пользователя.
       </td>
@@ -262,35 +232,3 @@ graph TB
     </tr>
   </tbody>
 </table>
-
----
-
-## 🧪 Тестирование
-
-| Тип | Инструменты | Описание |
-|---|---|---|
-| **Unit-тесты** | JUnit 5, Mockito | Покрытие бизнес-логики сервисного слоя |
-| **Интеграционные тесты** | TestContainers | Тесты с реальными PostgreSQL и Redis в Docker-контейнерах — максимально близко к продакшену |
-| **Асинхронные тесты** | Awaitility | Верификация многопоточных сценариев без Thread.sleep и гонок |
-| **Покрытие** | ![Coverage](https://img.shields.io/badge/Coverage-в%20процессе-yellow) | *(обновится после снятия метрики)* |
-
----
-
-## 🚀 Запуск
-
-```bash
-# Клонировать репозиторий
-git clone https://github.com/your-username/gymentry.git
-cd gymentry
-
-# Настроить переменные окружения
-cp .env.example .env
-# Отредактировать .env — DB, Redis, Kafka, JWT secret, email
-
-# Поднять всё окружение одной командой
-docker-compose up --build
-```
-
-Приложение будет доступно на `http://localhost:8080`
-
-> **Kubernetes:** манифесты для деплоя находятся в директории `/k8s`. CI/CD pipeline деплоит автоматически при пуше в `main`.
