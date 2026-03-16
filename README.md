@@ -78,7 +78,7 @@
 
 ## 🛠 Технологии
 ### приложение:
-- Spring Boot (Security, Web, Data, Cache, Kafka)
+- Spring Boot (Security, Web, Data, Cache, Mail, Kafka)
 - PostgreSQL
 - Redis
 - Kubernetes
