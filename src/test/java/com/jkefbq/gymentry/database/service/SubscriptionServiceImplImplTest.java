@@ -29,7 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SubscriptionServiceImplTest {
+public class SubscriptionServiceImplImplTest {
 
     private static final String EMAIL = "email@gmail.com";
     private static final BigDecimal DEF_SUB_SNAPSHOT_PRICE = BigDecimal.TEN;
@@ -43,7 +43,7 @@ public class SubscriptionServiceImplTest {
 
     @Spy
     @InjectMocks
-    SubscriptionService subscriptionService;
+    SubscriptionServiceImpl subscriptionServiceImpl;
 
     public SubscriptionDto getSubDto(boolean isActive) {
         return SubscriptionDto.builder()
@@ -61,7 +61,7 @@ public class SubscriptionServiceImplTest {
     public void createTest_notLastVisit_assertActive() {
         Subscription entity = subscriptionMapper.toEntity(getSubDto(true));
         when(subscriptionRepository.save(any())).thenReturn(entity);
-        var sub = subscriptionService.create(getSubDto(true));
+        var sub = subscriptionServiceImpl.sendCreateMessage(getSubDto(true));
 
         verify(subscriptionRepository).save(any());
         assertTrue(sub.getActive());
@@ -76,7 +76,7 @@ public class SubscriptionServiceImplTest {
         ).when(subscriptionRepository).save(any());
 
 
-        var savedSub = subscriptionService.create(sub);
+        var savedSub = subscriptionServiceImpl.sendCreateMessage(sub);
 
         verify(subscriptionRepository).save(any());
         assertFalse(savedSub.getActive());
@@ -87,7 +87,7 @@ public class SubscriptionServiceImplTest {
         Subscription entity = subscriptionMapper.toEntity(getSubDto(true));
         when(subscriptionRepository.save(any())).thenReturn(entity);
 
-        var sub = subscriptionService.create(getSubDto(true));
+        var sub = subscriptionServiceImpl.sendCreateMessage(getSubDto(true));
 
         verify(subscriptionRepository).save(any());
         assertTrue(sub.getActive());
@@ -97,30 +97,30 @@ public class SubscriptionServiceImplTest {
     public void validateAndGetActiveSubscription_throwNonActiveSubscriptionException() {
         doAnswer(invocation ->
             List.of(getSubDto(false), getSubDto(false), getSubDto(false))
-        ).when(subscriptionService).getUserSubs(any());
+        ).when(subscriptionServiceImpl).getUserSubs(any());
         var userId = UUID.randomUUID();
 
-        assertThrows(NonActiveSubscriptionException.class, () -> subscriptionService.getActiveSubscription(userId));
+        assertThrows(NonActiveSubscriptionException.class, () -> subscriptionServiceImpl.getActiveSubscription(userId));
     }
 
     @Test
     public void validateAndGetActiveSubscription_throwIllegalStateException() {
         doAnswer(invocation ->
                 List.of(getSubDto(true), getSubDto(true), getSubDto(false))
-        ).when(subscriptionService).getUserSubs(any());
+        ).when(subscriptionServiceImpl).getUserSubs(any());
         var userId = UUID.randomUUID();
 
-        assertThrows(IllegalStateException.class, () -> subscriptionService.getActiveSubscription(userId));
+        assertThrows(IllegalStateException.class, () -> subscriptionServiceImpl.getActiveSubscription(userId));
     }
 
     @Test
     public void activateSubscriptionTest() {
         doAnswer(invocation -> Optional.of(getSubDto(false)))
-                .when(subscriptionService).findById(any());
+                .when(subscriptionServiceImpl).findById(any());
         doAnswer(invocation -> invocation.getArgument(0))
-                .when(subscriptionService).update(any());
+                .when(subscriptionServiceImpl).update(any());
 
-        SubscriptionDto sub = subscriptionService.activateSubscription(UUID.randomUUID());
+        SubscriptionDto sub = subscriptionServiceImpl.activateSubscription(UUID.randomUUID());
 
         assertTrue(sub.getActive());
     }
@@ -130,41 +130,23 @@ public class SubscriptionServiceImplTest {
         var from = LocalDate.now();
         var to = LocalDate.now();
 
-        subscriptionService.getAllForPeriod(from, to);
+        subscriptionServiceImpl.getAllForPeriod(from, to);
 
         verify(subscriptionRepository).getAllForPeriod(from, to);
     }
 
     @Test
-    public void hasActiveSubscriptionsTest_assertFalse() {
-        var subs = List.of(getSubDto(false), getSubDto(false), getSubDto(false), getSubDto(false), getSubDto(false));
-
-        boolean hasActive = subscriptionService.hasActiveSubscription(subs);
-
-        assertFalse(hasActive);
-    }
-
-    @Test
-    public void hasActiveSubscriptionsTest_assertTrue() {
-        var subs = List.of(getSubDto(true), getSubDto(false), getSubDto(false), getSubDto(false), getSubDto(false));
-
-        boolean hasActive = subscriptionService.hasActiveSubscription(subs);
-
-        assertTrue(hasActive);
-    }
-
-    @Test
     public void findByIdTest() {
-        subscriptionService.findById(UUID.randomUUID());
+        subscriptionServiceImpl.findById(UUID.randomUUID());
         verify(subscriptionRepository).findById(any());
     }
 
     @Test
     public void deactivateSubscriptionTest() {
         var sub = getSubDto(true);
-        when(subscriptionService.findById(sub.getId())).thenReturn(Optional.of(sub));
-        doAnswer(invocation -> invocation.getArgument(0)).when(subscriptionService).update(any());
-        var updSub = subscriptionService.deactivateSubscription(sub.getId());
+        when(subscriptionServiceImpl.findById(sub.getId())).thenReturn(Optional.of(sub));
+        doAnswer(invocation -> invocation.getArgument(0)).when(subscriptionServiceImpl).update(any());
+        var updSub = subscriptionServiceImpl.deactivateSubscription(sub.getId());
 
         assertFalse(updSub.getActive());
     }

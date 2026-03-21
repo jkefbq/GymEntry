@@ -8,7 +8,7 @@ import com.jkefbq.gymentry.facade.UserAuthFacade;
 import com.jkefbq.gymentry.security.JwtFilter;
 import com.jkefbq.gymentry.security.MyUserDetailsService;
 import com.jkefbq.gymentry.security.SecurityConfig;
-import com.jkefbq.gymentry.security.UserCredentialsDto;
+import com.jkefbq.gymentry.dto.UserCredentialsDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

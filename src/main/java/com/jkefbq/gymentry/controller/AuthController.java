@@ -1,15 +1,15 @@
 package com.jkefbq.gymentry.controller;
 
-import com.jkefbq.gymentry.dto.EmailDto;
 import com.jkefbq.gymentry.database.dto.NotVerifiedUserDto;
+import com.jkefbq.gymentry.dto.EmailDto;
 import com.jkefbq.gymentry.dto.RefreshTokenDto;
 import com.jkefbq.gymentry.exception.InvalidTokenException;
 import com.jkefbq.gymentry.exception.InvalidVerificationCodeException;
 import com.jkefbq.gymentry.exception.TimeoutActivationCodeException;
 import com.jkefbq.gymentry.exception.UserAlreadyExistsException;
 import com.jkefbq.gymentry.facade.UserAuthFacade;
-import com.jkefbq.gymentry.security.TokenPairDto;
-import com.jkefbq.gymentry.security.UserCredentialsDto;
+import com.jkefbq.gymentry.dto.TokenPairDto;
+import com.jkefbq.gymentry.dto.UserCredentialsDto;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

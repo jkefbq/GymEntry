@@ -2,9 +2,10 @@ package com.jkefbq.gymentry.controller;
 
 import com.jkefbq.gymentry.database.dto.TariffDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
+import com.jkefbq.gymentry.database.service.SubscriptionServiceImpl;
 import com.jkefbq.gymentry.database.service.TariffService;
 import com.jkefbq.gymentry.dto.SubscriptionRequestDto;
-import com.jkefbq.gymentry.facade.MarketFacade;
+import com.jkefbq.gymentry.service.SubscriptionPriceCalculator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,8 @@ import java.util.List;
 public class PurchaseController {
 
     private final TariffService tariffService;
-    private final MarketFacade marketFacade;
+    private final SubscriptionPriceCalculator subscriptionPriceCalculator;
+    private final SubscriptionServiceImpl subscriptionServiceImpl;
 
     @GetMapping
     public List<TariffDto> getAllTariffs() {
@@ -42,7 +44,7 @@ public class PurchaseController {
             @PathVariable("visits") Integer visitsCount
     ) {
         log.info("call /market/calculate-price/{}/{}", tariffType, visitsCount);
-        return marketFacade.calculatePrice(tariffType, visitsCount);
+        return subscriptionPriceCalculator.calculate(tariffType, visitsCount);
     }
 
     @PostMapping("/subscription")
@@ -51,7 +53,7 @@ public class PurchaseController {
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         log.info("call /market/subscription");
-        marketFacade.create(requestDto, userDetails.getUsername());
+        subscriptionServiceImpl.sendCreateMessage(requestDto, userDetails.getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

@@ -3,16 +3,15 @@ package com.jkefbq.gymentry;
 import com.jkefbq.gymentry.database.dto.NotVerifiedUserDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
 import com.jkefbq.gymentry.database.service.NotVerifiedUserService;
-import com.jkefbq.gymentry.database.service.SubscriptionManager;
+import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.dto.EntryCode;
 import com.jkefbq.gymentry.dto.SubscriptionRequestDto;
-import com.jkefbq.gymentry.facade.MarketFacade;
+import com.jkefbq.gymentry.dto.UserCredentialsDto;
 import com.jkefbq.gymentry.security.JwtService;
-import com.jkefbq.gymentry.security.UserCredentialsDto;
-import com.jkefbq.gymentry.service.KafkaConsumer;
-import com.jkefbq.gymentry.service.KafkaProducer;
 import com.jkefbq.gymentry.service.MailService;
+import com.jkefbq.gymentry.service.MessageConsumerImpl;
+import com.jkefbq.gymentry.service.MessageProducer;
 import com.jkefbq.gymentry.service.SubscriptionPriceCalculator;
 import com.jkefbq.gymentry.service.VerificationCodeService;
 import jakarta.transaction.Transactional;
@@ -45,7 +44,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -82,22 +80,20 @@ class GymEntryApplicationTests {
     @Autowired
     SubscriptionPriceCalculator subscriptionPriceCalculator;
     @Autowired
-    SubscriptionManager subscriptionManager;
+    SubscriptionService subscriptionService;
 
+    @MockitoBean
+    MessageProducer messageProducer;
     @MockitoBean
     MailService mailService;
     @MockitoBean
-    KafkaProducer kafkaProducer;
-    @MockitoBean
-    KafkaConsumer kafkaConsumer;
+    MessageConsumerImpl messageConsumerImpl;
     @MockitoBean
     VerificationCodeService verificationCodeService;
     @MockitoSpyBean
     NotVerifiedUserService notVerifiedUserService;
     @MockitoSpyBean
     UserService userService;
-    @MockitoSpyBean
-    MarketFacade marketFacade;
 
     @Container
     private static final PostgreSQLContainer<?> POSTGRES_CONTAINER =
@@ -171,7 +167,7 @@ class GymEntryApplicationTests {
     public void entryToGymSimulationTest_userAdminInteraction() throws Exception {
         //user
         var user = userService.findByEmail(USER_EMAIL).orElseThrow();
-        var visitsLeftBefore = subscriptionManager.getActiveSubscription(user.getId()).getVisitsLeft();
+        var visitsLeftBefore = subscriptionService.getActiveSubscription(user.getId()).getVisitsLeft();
         var userAccessToken = jwtService.generateAccessToken(USER_EMAIL);
         String entryCode = mockMvc.perform(put("/user/entry")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAccessToken)
@@ -185,14 +181,13 @@ class GymEntryApplicationTests {
                 .content(objectMapper.writeValueAsString(new EntryCode(entryCode)))
         ).andExpect(status().isOk());
 
-        var visitsLeftAfter = subscriptionManager.getActiveSubscription(user.getId()).getVisitsLeft();
+        var visitsLeftAfter = subscriptionService.getActiveSubscription(user.getId()).getVisitsLeft();
         assertEquals(visitsLeftBefore, visitsLeftAfter + 1);
     }
 
     @Test
     @Sql("/insert-test-user.sql")
     public void buySubscriptionTest() throws Exception {
-        doNothing().when(marketFacade).create(any(), any());
         var visitsTotal = ThreadLocalRandom.current().nextInt(12);
         var tariffType = TariffType.BASIC;
         var sub = new SubscriptionRequestDto(visitsTotal, tariffType);

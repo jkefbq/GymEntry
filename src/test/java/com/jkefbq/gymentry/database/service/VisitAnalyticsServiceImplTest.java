@@ -14,9 +14,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class VisitAnalyticsServiceTest {
+public class VisitAnalyticsServiceImplTest {
 
-    VisitAnalytics visitAnalytics = new VisitAnalyticsService();
+    VisitAnalyticsService visitAnalyticsService = new VisitAnalyticsServiceImpl();
 
     @Test
     public void getAvgPerDayTest() {
@@ -24,7 +24,7 @@ public class VisitAnalyticsServiceTest {
         var wholeDays = 25L;
         BigDecimal trueResult = BigDecimal.valueOf(visitCount / wholeDays);
 
-        BigDecimal res = visitAnalytics.getAvgPerDay(visitCount, wholeDays);
+        BigDecimal res = visitAnalyticsService.getAvgPerDay(visitCount, wholeDays);
 
         assertEquals(trueResult, res);
     }
@@ -38,7 +38,7 @@ public class VisitAnalyticsServiceTest {
         var v5 = VisitDto.builder().createdAt(LocalDateTime.now().plusDays(2)).build();
         List<VisitDto> visits = List.of(v1, v2, v3, v4, v5);
 
-        List<VisitPerDate> resultList = visitAnalytics.getVisitsPerDate(visits);
+        List<VisitPerDate> resultList = visitAnalyticsService.getVisitsPerDate(visits);
 
         var mergedV1V2 = resultList.stream().filter(e -> e.getDate().equals(v1.getCreatedAt().toLocalDate())).findFirst().orElseThrow();
         assertEquals(3, resultList.size());
@@ -51,7 +51,7 @@ public class VisitAnalyticsServiceTest {
         var regularVisit = VisitDto.builder().createdAt(LocalDateTime.now()).build();
         var visits = List.of(regularVisit, targetVisit, targetVisit, targetVisit);
 
-        PeakVisitsDay peak = visitAnalytics.getPeakDay(visits);
+        PeakVisitsDay peak = visitAnalyticsService.getPeakDay(visits);
 
         assertEquals(targetVisit.getCreatedAt().toLocalDate(), peak.getDate());
         assertEquals(3, peak.getVisitCount());
@@ -67,7 +67,7 @@ public class VisitAnalyticsServiceTest {
                 .build();
         var visits = List.of(visitPremiumTariff, visitPremiumTariff, visitPremiumTariff, visitBasicTariff);
 
-        List<VisitTariffPerDate> visitsByTariff = visitAnalytics.getTariffsPerDate(visits);
+        List<VisitTariffPerDate> visitsByTariff = visitAnalyticsService.getTariffsPerDate(visits);
 
         var premium = visitsByTariff.stream().filter(e -> e.getTariffType() == TariffType.PREMIUM).findFirst().orElseThrow();
         assertEquals(2, visitsByTariff.size());

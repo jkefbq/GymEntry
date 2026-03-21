@@ -5,9 +5,9 @@ import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.dto.VisitDto;
 import com.jkefbq.gymentry.database.service.GymInfoService;
-import com.jkefbq.gymentry.database.service.SubscriptionManager;
+import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
-import com.jkefbq.gymentry.database.service.VisitManager;
+import com.jkefbq.gymentry.database.service.VisitService;
 import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
 import com.jkefbq.gymentry.service.EntryCodeService;
 import org.junit.jupiter.api.Test;
@@ -29,11 +29,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class GymEntryFacadeImplTest {
+public class GymEntryFacadeTest {
 
     private static final String MOCK_EMAIL = "email@gmail.com";
 
@@ -42,49 +43,46 @@ public class GymEntryFacadeImplTest {
     @Mock
     EntryCodeService entryCodeService;
     @Mock
-    SubscriptionManager subscriptionManager;
+    SubscriptionService subscriptionService;
     @Mock
     GymInfoService gymInfoService;
     @Mock
-    VisitManager visitManager;
+    VisitService visitService;
 
     @Spy
     @InjectMocks
-    GymEntryFacadeImpl gymEntryFacade;
+    GymEntryFacade gymEntryFacade;
 
     @Test
     public void tryEntryTest() {
         when(userService.findByEmail(MOCK_EMAIL)).thenReturn(Optional.of(PartialUserDto.builder().id(UUID.randomUUID()).build()));
-        when(subscriptionManager.getUserSubs(any())).thenReturn(List.of());
-        when(subscriptionManager.getActiveSubscription(any())).thenReturn(new SubscriptionDto());
+        when(subscriptionService.getUserSubs(any())).thenReturn(List.of());
+        when(subscriptionService.getActiveSubscription(any())).thenReturn(new SubscriptionDto());
+        doNothing().when(subscriptionService).checkActiveSub(any());
         doNothing().when(gymEntryFacade).checkAllSubs(any());
-        doNothing().when(subscriptionManager).checkActiveSub(any());
 
         gymEntryFacade.tryEntry(MOCK_EMAIL);
 
-        verify(subscriptionManager).getActiveSubscription(any());
+        verify(subscriptionService).getActiveSubscription(any());
         verify(entryCodeService).generateUserEntryCode(MOCK_EMAIL);
     }
 
     @Test
     public void confirmEntryTest() {
-        var entryCode = RandomStringUtils.randomNumeric(6);
-        doAnswer(invocation -> SubscriptionDto.builder().active(true).build()).when(gymEntryFacade).findAndDecrementSub(entryCode);
-        doAnswer(invocation -> new PartialUserDto()).when(gymEntryFacade).refreshUser(MOCK_EMAIL);
+        doReturn(new SubscriptionDto()).when(gymEntryFacade).findAndDecrementSub(any());
+        doReturn(new PartialUserDto()).when(gymEntryFacade).refreshUser(any());
         doNothing().when(gymEntryFacade).createVisit(any(), any());
+        var entryCode = RandomStringUtils.randomNumeric(6);
 
         gymEntryFacade.confirmEntry(entryCode, MOCK_EMAIL, "address");
 
-        verify(gymEntryFacade).findAndDecrementSub(entryCode);
-        verify(gymEntryFacade).refreshUser(MOCK_EMAIL);
-        verify(gymEntryFacade).createVisit(any(), any());
         verify(userService).update(any());
-        verify(subscriptionManager).update(any());
+        verify(subscriptionService).update(any());
     }
 
     @Test
     public void refreshUserTest() {
-        var totalVisitsBefore = 10;
+        Integer totalVisitsBefore = 10;
         when(userService.findByEmail(MOCK_EMAIL))
                 .thenReturn(Optional.of(PartialUserDto.builder().totalVisits(totalVisitsBefore).build()));
 
@@ -115,7 +113,7 @@ public class GymEntryFacadeImplTest {
 
         verify(entryCodeService).getEmailByCode(entryCode);
         verify(userService).findByEmail(any());
-        verify(subscriptionManager).getActiveSubscription(any());
+        verify(subscriptionService).getActiveSubscription(any());
     }
 
     @Test
@@ -128,7 +126,7 @@ public class GymEntryFacadeImplTest {
         gymEntryFacade.createVisit(gym.getAddress(), activeSub);
 
         verify(gymInfoService).getByAddress(gym.getAddress());
-        verify(visitManager).create(captor.capture());
+        verify(visitService).create(captor.capture());
         assertEquals(activeSub, captor.getValue().getSubscription());
         assertEquals(gym, captor.getValue().getGym());
         assertEquals(LocalDate.now(), captor.getValue().getCreatedAt().toLocalDate());

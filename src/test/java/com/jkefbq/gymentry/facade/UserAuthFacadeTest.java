@@ -9,7 +9,7 @@ import com.jkefbq.gymentry.exception.InvalidVerificationCodeException;
 import com.jkefbq.gymentry.exception.TimeoutActivationCodeException;
 import com.jkefbq.gymentry.exception.UserAlreadyExistsException;
 import com.jkefbq.gymentry.security.JwtService;
-import com.jkefbq.gymentry.security.UserCredentialsDto;
+import com.jkefbq.gymentry.dto.UserCredentialsDto;
 import com.jkefbq.gymentry.service.MailService;
 import com.jkefbq.gymentry.service.VerificationCodeService;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserAuthFacadeImplTest {
+public class UserAuthFacadeTest {
 
     @Mock
     NotVerifiedUserService notVerifiedUserService;
@@ -46,7 +46,7 @@ public class UserAuthFacadeImplTest {
 
     @Spy
     @InjectMocks
-    UserAuthFacadeImpl userAuthFacade;
+    UserAuthFacade userAuthFacade;
 
     @Test
     public void registerTest() throws UserAlreadyExistsException {

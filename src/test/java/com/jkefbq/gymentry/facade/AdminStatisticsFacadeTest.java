@@ -3,10 +3,10 @@ package com.jkefbq.gymentry.facade;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
 import com.jkefbq.gymentry.database.dto.VisitDto;
-import com.jkefbq.gymentry.database.service.SubscriptionAnalytics;
-import com.jkefbq.gymentry.database.service.SubscriptionManager;
-import com.jkefbq.gymentry.database.service.VisitAnalytics;
-import com.jkefbq.gymentry.database.service.VisitManager;
+import com.jkefbq.gymentry.database.service.SubscriptionAnalyticsService;
+import com.jkefbq.gymentry.database.service.SubscriptionService;
+import com.jkefbq.gymentry.database.service.VisitAnalyticsService;
+import com.jkefbq.gymentry.database.service.VisitService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,21 +24,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AdminStatisticsFacadeImplTest {
+public class AdminStatisticsFacadeTest {
 
     private static final String MOCK_ADDRESS = "address";
 
     @Mock
-    VisitManager visitManager;
+    VisitService visitService;
     @Mock
-    VisitAnalytics visitAnalytics;
+    VisitAnalyticsService visitAnalyticsService;
     @Mock
-    SubscriptionAnalytics subscriptionAnalytics;
+    SubscriptionAnalyticsService subscriptionAnalyticsService;
     @Mock
-    SubscriptionManager subscriptionManager;
+    SubscriptionService subscriptionService;
 
     @InjectMocks
-    AdminStatisticsFacadeImpl adminStat;
+    AdminStatisticsFacade adminStat;
 
     public List<VisitDto> getVisits() {
         var visit = VisitDto.builder().createdAt(LocalDateTime.now()).id(UUID.randomUUID()).build();
@@ -57,14 +57,14 @@ public class AdminStatisticsFacadeImplTest {
         var to = LocalDateTime.now();
         var wholeDays = ChronoUnit.DAYS.between(from, to);
         var visits = getVisits();
-        when(visitManager.getAllForPeriod(from, to, MOCK_ADDRESS)).thenReturn(visits);
+        when(visitService.getAllForPeriod(from, to, MOCK_ADDRESS)).thenReturn(visits);
 
         adminStat.getVisitStatisticsForPeriod(from, to, MOCK_ADDRESS);
 
-        verify(visitAnalytics).getAvgPerDay(visits.size(), wholeDays);
-        verify(visitAnalytics).getPeakDay(visits);
-        verify(visitAnalytics).getVisitsPerDate(visits);
-        verify(visitAnalytics).getTariffsPerDate(visits);
+        verify(visitAnalyticsService).getAvgPerDay(visits.size(), wholeDays);
+        verify(visitAnalyticsService).getPeakDay(visits);
+        verify(visitAnalyticsService).getVisitsPerDate(visits);
+        verify(visitAnalyticsService).getTariffsPerDate(visits);
     }
 
     @Test
@@ -73,15 +73,15 @@ public class AdminStatisticsFacadeImplTest {
         var to = LocalDate.now();
         var wholeDays = ChronoUnit.DAYS.between(from, to);
         var subscriptions = getSubscriptions();
-        when(subscriptionManager.getAllForPeriod(from, to)).thenReturn(subscriptions);
+        when(subscriptionService.getAllForPeriod(from, to)).thenReturn(subscriptions);
 
         adminStat.getPurchaseStatisticsForPeriod(from, to);
 
-        verify(subscriptionAnalytics).getTotalRevenue(subscriptions);
-        verify(subscriptionAnalytics).getAvgDayCheck(subscriptions, wholeDays);
-        verify(subscriptionAnalytics).getAvgPerPurchaseCheck(subscriptions);
-        verify(subscriptionAnalytics).getPeakDay(subscriptions);
-        verify(subscriptionAnalytics).getPurchasesPerDate(subscriptions);
-        verify(subscriptionAnalytics).getPurchasesPerTariff(subscriptions);
+        verify(subscriptionAnalyticsService).getTotalRevenue(subscriptions);
+        verify(subscriptionAnalyticsService).getAvgDayCheck(subscriptions, wholeDays);
+        verify(subscriptionAnalyticsService).getAvgPerPurchaseCheck(subscriptions);
+        verify(subscriptionAnalyticsService).getPeakDay(subscriptions);
+        verify(subscriptionAnalyticsService).getPurchasesPerDate(subscriptions);
+        verify(subscriptionAnalyticsService).getPurchasesPerTariff(subscriptions);
     }
 }

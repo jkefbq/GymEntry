@@ -1,13 +1,14 @@
 package com.jkefbq.gymentry.controller;
 
-import com.jkefbq.gymentry.dto.SubscriptionRequestDto;
 import com.jkefbq.gymentry.database.dto.TariffType;
+import com.jkefbq.gymentry.database.service.SubscriptionServiceImpl;
 import com.jkefbq.gymentry.database.service.TariffService;
 import com.jkefbq.gymentry.database.service.UserServiceImpl;
-import com.jkefbq.gymentry.facade.MarketFacade;
+import com.jkefbq.gymentry.dto.SubscriptionRequestDto;
 import com.jkefbq.gymentry.security.JwtFilter;
 import com.jkefbq.gymentry.security.MyUserDetailsService;
 import com.jkefbq.gymentry.security.SecurityConfig;
+import com.jkefbq.gymentry.service.SubscriptionPriceCalculator;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -55,7 +56,9 @@ public class PurchaseControllerTest {
     @MockitoBean
     TariffService tariffService;
     @MockitoBean
-    MarketFacade marketFacade;
+    SubscriptionPriceCalculator subscriptionPriceCalculator;
+    @MockitoBean
+    SubscriptionServiceImpl subscriptionServiceImpl;
 
     @BeforeEach
     public void setUp() throws ServletException, IOException {
@@ -87,7 +90,7 @@ public class PurchaseControllerTest {
         var visitsCount = 12;
         mockMvc.perform(get("/market/calculate-price/{tariff-type}/{visits}", TariffType.BASIC, visitsCount))
                 .andExpect(status().isOk());
-        verify(marketFacade).calculatePrice(TariffType.BASIC, visitsCount);
+        verify(subscriptionPriceCalculator).calculate(TariffType.BASIC, visitsCount);
     }
 
     @Test
@@ -97,7 +100,7 @@ public class PurchaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new SubscriptionRequestDto())))
                 .andExpect(status().isCreated());
-        verify(marketFacade).create(any(), any());
+        verify(subscriptionServiceImpl).sendCreateMessage(any(), any());
     }
 
 }

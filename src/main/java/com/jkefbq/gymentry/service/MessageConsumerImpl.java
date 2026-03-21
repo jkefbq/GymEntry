@@ -2,7 +2,7 @@ package com.jkefbq.gymentry.service;
 
 import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
-import com.jkefbq.gymentry.database.service.SubscriptionManager;
+import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.dto.PurchaseDto;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +14,10 @@ import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
-public class KafkaConsumer implements MessageConsumer {
+public class MessageConsumerImpl implements MessageConsumer {
 
     private final UserService userService;
-    private final SubscriptionManager subscriptionManager;
+    private final SubscriptionService subscriptionService;
     private final SubscriptionPriceCalculator subscriptionPriceCalculator;
 
     @KafkaListener(topics = "${app.kafka.topics.confirmed-subscriptions}")
@@ -33,6 +33,6 @@ public class KafkaConsumer implements MessageConsumer {
                 .purchaseAt(LocalDate.now())
                 .userId(user.getId())
                 .build();
-        subscriptionManager.create(sub);
+        subscriptionService.sendCreateMessage(sub);
     }
 }

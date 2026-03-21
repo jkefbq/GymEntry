@@ -3,7 +3,7 @@ package com.jkefbq.gymentry.facade;
 import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.dto.UserDto;
 import com.jkefbq.gymentry.database.mapper.UserMapper;
-import com.jkefbq.gymentry.database.service.SubscriptionManager;
+import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ class UserWithSubsFacadeTest {
     @Mock
     UserService userService;
     @Mock
-    SubscriptionManager subscriptionManager;
+    SubscriptionService subscriptionService;
 
     @InjectMocks
     UserWithSubsFacade userWithSubsFacade;
@@ -40,7 +40,7 @@ class UserWithSubsFacadeTest {
         userWithSubsFacade.findByEmail(email);
 
         verify(userService).findByEmail(email);
-        verify(subscriptionManager).getUserSubs(any());
+        verify(subscriptionService).getUserSubs(any());
         verify(userMapper).toFullDto(any());
     }
 
@@ -53,7 +53,7 @@ class UserWithSubsFacadeTest {
         userWithSubsFacade.findByUserId(userId);
 
         verify(userService).findById(any());
-        verify(subscriptionManager).getUserSubs(any());
+        verify(subscriptionService).getUserSubs(any());
         verify(userMapper).toFullDto(any());
     }
 }

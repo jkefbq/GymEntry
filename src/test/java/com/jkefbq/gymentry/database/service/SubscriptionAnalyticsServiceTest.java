@@ -19,10 +19,10 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class SubscriptionAnalyticsTest {
+public class SubscriptionAnalyticsServiceTest {
 
     @Spy
-    SubscriptionAnalyticsService subscriptionAnalytics;
+    SubscriptionAnalyticsServiceImpl subscriptionAnalytics;
 
     private static final BigDecimal DEF_SUB_SNAPSHOT_PRICE = BigDecimal.TEN;
 

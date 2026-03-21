@@ -2,7 +2,7 @@ package com.jkefbq.gymentry.controller;
 
 import com.jkefbq.gymentry.database.dto.PartialUserDto;
 import com.jkefbq.gymentry.database.dto.SubscriptionDto;
-import com.jkefbq.gymentry.database.service.SubscriptionManager;
+import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserService;
 import com.jkefbq.gymentry.exception.InvalidSubscriptionException;
 import com.jkefbq.gymentry.exception.NonActiveSubscriptionException;
@@ -29,7 +29,7 @@ public class UserController {
 
     private final GymEntryFacade gymEntryFacade;
     private final UserService userService;
-    private final SubscriptionManager subscriptionManager;
+    private final SubscriptionService subscriptionService;
 
     @GetMapping("me")
     public PartialUserDto getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
@@ -41,21 +41,21 @@ public class UserController {
     public List<SubscriptionDto> getAllSubscriptions(@AuthenticationPrincipal UserDetails userDetails) {
         log.info("call '/user/subscriptions', user with email {}", userDetails.getUsername());
         var userId = userService.getUserIdByEmail(userDetails.getUsername()).orElseThrow();
-        return subscriptionManager.getUserSubs(userId);
+        return subscriptionService.getUserSubs(userId);
     }
 
     @GetMapping("subscriptions/active")
     public SubscriptionDto getActiveSubscription(@AuthenticationPrincipal UserDetails userDetails) throws NonActiveSubscriptionException {
         log.info("call '/user/subscriptions/active', user with email {}", userDetails.getUsername());
         var userId = userService.getUserIdByEmail(userDetails.getUsername()).orElseThrow();
-        return subscriptionManager.getActiveSubscription(userId);
+        return subscriptionService.getActiveSubscription(userId);
     }
 
     @PostMapping("subscriptions/activate")
     public SubscriptionDto activateSubscription(
             @AuthenticationPrincipal UserDetails userDetails, @RequestBody UUID subscriptionId) {
         log.info("call '/user/subscriptions/activate', user with email {}, subscription id {}", userDetails.getUsername(), subscriptionId);
-        return subscriptionManager.activateSubscription(subscriptionId);
+        return subscriptionService.activateSubscription(subscriptionId);
     }
 
     @PutMapping("/entry")
@@ -67,6 +67,6 @@ public class UserController {
     @PostMapping("subscriptions/deactivate")
     public SubscriptionDto deactivate(@RequestBody UUID subscriptionId) {
         log.info("call 'user/subscriptions/deactivate', subscription id {}", subscriptionId);
-        return subscriptionManager.deactivateSubscription(subscriptionId);
+        return subscriptionService.deactivateSubscription(subscriptionId);
     }
 }

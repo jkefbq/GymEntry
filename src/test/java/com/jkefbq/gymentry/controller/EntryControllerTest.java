@@ -1,7 +1,7 @@
 package com.jkefbq.gymentry.controller;
 
 import com.jkefbq.gymentry.database.dto.PartialUserDto;
-import com.jkefbq.gymentry.database.service.SubscriptionManager;
+import com.jkefbq.gymentry.database.service.SubscriptionService;
 import com.jkefbq.gymentry.database.service.UserServiceImpl;
 import com.jkefbq.gymentry.facade.GymEntryFacade;
 import com.jkefbq.gymentry.security.JwtFilter;
@@ -59,7 +59,7 @@ public class EntryControllerTest {
     @MockitoBean
     GymEntryFacade gymEntryFacade;
     @MockitoBean
-    private SubscriptionManager subscriptionService;
+    private SubscriptionService subscriptionService;
 
     public PartialUserDto getPartialUser() {
         return PartialUserDto.builder()

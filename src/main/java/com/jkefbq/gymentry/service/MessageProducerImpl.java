@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class KafkaProducer implements MessageProducer {
+public class MessageProducerImpl implements MessageProducer {
 
     private final KafkaTemplate<@NonNull String,@NonNull Object> kafkaTemplate;
     private final YamlConfig yamlConfig;

@@ -1,5 +1,7 @@
 package com.jkefbq.gymentry.security;
 
+import com.jkefbq.gymentry.dto.TokenPairDto;
+
 public interface JwtService {
     TokenPairDto generateTokenPair(String email);
     TokenPairDto refreshAccessTokenAndRotate(String email);

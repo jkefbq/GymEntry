@@ -18,7 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class VisitServiceTest {
+public class VisitServiceImplTest {
 
     @Mock
     VisitRepository visitRepository;
@@ -26,7 +26,7 @@ public class VisitServiceTest {
     VisitMapper visitMapper;
 
     @InjectMocks
-    VisitService visitService;
+    VisitServiceImpl visitServiceImpl;
 
     public VisitDto getVisitDto() {
         return VisitDto.builder().id(UUID.randomUUID())
@@ -38,13 +38,13 @@ public class VisitServiceTest {
 
     @Test
     public void createTest() {
-        visitService.create(new VisitDto());
+        visitServiceImpl.create(new VisitDto());
         verify(visitRepository).save(any());
     }
 
     @Test
     public void getAllTest() {
-        visitService.getAll();
+        visitServiceImpl.getAll();
         verify(visitRepository).findAll();
     }
 
@@ -54,7 +54,7 @@ public class VisitServiceTest {
         var to = LocalDateTime.now();
         var address = "address";
 
-        visitService.getAllForPeriod(from, to, address);
+        visitServiceImpl.getAllForPeriod(from, to, address);
 
         verify(visitRepository).getAllForPeriod(from, to, address);
     }

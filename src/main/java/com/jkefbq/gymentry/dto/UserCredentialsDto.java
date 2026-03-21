@@ -1,4 +1,4 @@
-package com.jkefbq.gymentry.security;
+package com.jkefbq.gymentry.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
