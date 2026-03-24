@@ -78,30 +78,30 @@
 
 ## 🛠 Технологии
 ### приложение:
-- Spring Boot (Security, Web, Data, Cache, Mail, Kafka)
-- PostgreSQL
-- Redis
-- Kubernetes
-- Kafka
-- Docker
-- Liquibase
-- Swagger
-- Jwt auth
-- MapStruct
-- GitHub Actions
-- Lombok
-- Maven
+* <img src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/spring_boot.png" width="20" height="20"/> Spring Boot (Security, Web, Data, Cache, Mail, Kafka)
+* <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" width="20" height="20"/> PostgreSQL
+* <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" width="20" height="20"/> Redis
+* <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" width="20" height="20"/> Kubernetes
+* <img src="https://cdn.simpleicons.org/apachekafka/ffffff" width="20" height="20"/> Kafka
+* <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="20" height="20"/> Docker
+* <img src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/nginx.png" width="20" height="20"/> Nginx
+* <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/liquibase/liquibase-original.svg" width="20" height="20"/> Liquibase  
+* <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/githubactions/githubactions-original.svg" width="20" height="20"/> GitHub Actions  
+* <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/maven/maven-original.svg" width="20" height="20"/> Maven  
+* <img src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/swagger.png" width="20" height="20"/> Swagger
+* <img src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/mapstruct.png" width="20" height="20"/> MapStruct
+* <img src="https://raw.githubusercontent.com/marwin1991/profile-technology-icons/refs/heads/main/icons/lombok.png" width="20" height="20"/> Lombok
 ### тесты:
-- JUnit
-- Mockito
-- TestContainers
-- Awaitility
+- <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/junit/junit-original.svg" width="20" height="20"/> JUnit
+- <img src="https://avatars.githubusercontent.com/u/2054056" width="20" height="20"/> Mockito
+- <img src="https://avatars.githubusercontent.com/u/13393021" width="20" height="20"/> TestContainers
+- <img src="https://raw.githubusercontent.com/awaitility/awaitility.github.io/master/img/logo-transparent-smaller.png" width="20" height="20"/> Awaitility
 
 
-## 🚀 Функциональность
+## <img src="https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@latest/assets/Sparkles/3D/sparkles_3d.png" width="25" height="25"/> Функциональность
  
 <details>
-<summary><b>🙍‍♂️ Пользователь</b></summary>
+<summary><b><img src="https://github.githubassets.com/images/icons/emoji/unicode/1f464.png" width="20" height="20"/> Пользователь</b></summary>
 <br>
 <table>
   <thead>
@@ -140,7 +140,7 @@
 </details>
 
 <details>
-<summary><b>🔐 Администратор</b></summary>
+<summary><b><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f6e1.svg" width="20" height="20"/> Администратор</b></summary>
 <br>
 <table>
   <thead>
